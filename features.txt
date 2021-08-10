@@ -1,0 +1,11 @@
+1) Able to follow Other Person 
+  -> Extended : Follow should be done only if follower accepts followee's request
+               and vice versa.
+2) Store all hashtags, and on requesting any hashtag provide all posts that has hashtag..
+  -> provide all post of some hashtags from a specific Person
+3) Reposting a Post, make a chain of nodes (post) ( Not yet decided how to work on this ) 
+4) Able to block people, make a block table Many-to-one relationship.
+5) Post Image/s 
+  -> Extended : Able to crop,edit,filter before posting.
+6) Add a message Queuing (RabbitMQ) for posting, when many people are post simultaneously.
+  -> Main in development 

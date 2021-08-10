@@ -1,36 +1,38 @@
 import {
-  BaseEntity,
   BeforeInsert,
   Entity,
   Column,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-  CreateDateColumn,
 } from 'typeorm';
+import { FakeBaseEntity } from '../commons/base.entity';
 
 import * as bcrypt from 'bcryptjs';
 
-@Entity()
-export class User extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+@Entity('users')
+export class User extends FakeBaseEntity {
 
-  @Column()
-  name: string;
+  @Column({ nullable: false, length: 50, unique : true })
+  userName: string;
 
-  @Column()
+  @Column({ nullable: false, length: 50, unique : true })
   email: string;
 
-  @Column()
+  @Column({ nullable: false })
   password: string;
 
-  @Column()
-  @CreateDateColumn()
-  createdAt: Date;
+  @Column({ nullable: true, length: 50 })
+  bio ?: string;
 
-  @Column()
-  @UpdateDateColumn()
-  updatedAt: Date;
+  @Column({ nullable: true, length: 50 })
+  avatar ?: string;
+
+  @Column({ name : 'follower_count', default : 0 })
+  followerCount: number;
+
+  @Column({ name : 'followee_count', default : 0 })
+  followeeCount: number;
+
+  @Column('boolean', { default: false })
+  verified : boolean;
 
   @BeforeInsert()
   async hashPassword() {

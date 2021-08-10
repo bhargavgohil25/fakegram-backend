@@ -19,13 +19,13 @@ export class AuthController {
     return this.authService.signin(authLoginDto);
   }
 
-  @Get('/profile')
-  @UseGuards(JwtAuthGuard)
-  getProfile(@Request() req) {
-    const { userId, userName } = req;
-    return {
-      id: userId,
-      name: userName,
-    };
-  }
+  // @Get('/profile')
+  // @UseGuards(JwtAuthGuard)
+  // getProfile(@Request() req) {
+  //   const { userId, userName } = req;
+  //   return {
+  //     id: userId,
+  //     name: userName,
+  //   };
+  // }
 }

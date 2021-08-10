@@ -25,6 +25,6 @@ import { AuthMiddleware } from './middlewares/auth.middleware';
 })
 export class AuthModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes('/users/profile');
+    // consumer.apply(AuthMiddleware).forRoutes('/users/profile');
   }
 }

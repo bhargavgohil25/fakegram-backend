@@ -15,7 +15,7 @@ export class AuthService {
 
     const payload = {
       userId: user.id,
-      userName: user.name,
+      userName: user.userName,
       // userEmail : user.email,
     };
 
@@ -30,7 +30,7 @@ export class AuthService {
     const user = await this.usersService.findByEmail(email);
 
     if (!(await this.usersService.validatePassword(password, email))) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException("Invalid Paaword Or Email");
     }
 
     return user;
@@ -41,10 +41,10 @@ export class AuthService {
 
     const user = await this.jwtService.verify(resToken);
     if (!user) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException("Invalid Paaword Or Email");
     }
-    console.log('verifyToken');
-    console.log(user);
+    // console.log('verifyToken');
+    // console.log(user);
     return user;
   }
 }

@@ -1,16 +1,17 @@
-import { IsEmail, IsNotEmpty } from 'class-validator'
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator'
 
 export class AuthSigninDto {
 
   @IsNotEmpty()
-  name : string
+  @IsString()
+  userName : string;
 
   @IsEmail()
   @IsNotEmpty()
-  email: string
+  email: string;
 
   @IsNotEmpty()
-  password: string
+  password: string;
 }
 
 
