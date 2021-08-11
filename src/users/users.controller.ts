@@ -42,6 +42,13 @@ export class UsersController {
     return followedUser;
   }
 
+  @Get('/:userid/followinfo')
+  async followInfo(@Param('userid') userid : string) {
+    const result = await this.usersService.getUserFollowInfo(userid);
+    console.log(result)
+    return result;
+  }
+
   //! Testing for current user
   @Get('/current')
   @UseGuards(JwtAuthGuard)

@@ -7,7 +7,7 @@ import {
 import { User } from './users.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { getManager, getRepository, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { UserFollowing } from './users-follow.entity';
@@ -48,6 +48,7 @@ export class UsersService {
 
   /*
    *  Create user- user relation
+   *  @Param(userId) : To whom we are following
    */
   public async createUserFollowRelation(follower: User, followeeId: string) {
     const followee = await this.findById(followeeId);
@@ -63,6 +64,32 @@ export class UsersService {
 
     return newFollowee.followee;
   }
+
+  /*
+  * @Description: Followers and Followees of a Particular User
+  * @Param(UserId) : Of whom we want to know the followers and followees
+  */
+
+  public async getUserFollowInfo(userid: string) {
+    
+    const info = await this.userRepo
+      .createQueryBuilder('userFollowing')
+      .select()
+      .leftJoinAndSelect('userFollowing.followers','followers')
+      .leftJoinAndSelect('userFollowing.followees', 'followees')
+      .where('userFollowing.id = :userid', { userid })
+      .getMany()
+
+    return info;
+  }
+
+  // public async getProfile(username: string) {
+  //   const user = await this.userRepo
+  //     .createQueryBuilder()
+  //     .select('*')
+  //     .from(User, 'users')
+  //     // .leftJoinAndSelect();
+  // }
 
   async showById(id: number) {
     const user = await this.userRepo.findOne(id);

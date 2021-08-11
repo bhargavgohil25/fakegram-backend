@@ -1,4 +1,11 @@
 import { Expose } from "class-transformer";
+import { User } from "../users.entity";
+
+interface mock {
+  id : string;
+  createdAt : Date;
+  updatedAt : Date;
+}
 
 export class UserDto {
   @Expose()
@@ -24,5 +31,11 @@ export class UserDto {
 
   @Expose()
   verified : boolean;
+
+  @Expose()
+  followers : Array<mock | User>;
+
+  @Expose()
+  followees : Array<mock | User>;
 }
 

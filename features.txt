@@ -9,3 +9,8 @@
   -> Extended : Able to crop,edit,filter before posting.
 6) Add a message Queuing (RabbitMQ) for posting, when many people are post simultaneously.
   -> Main in development 
+
+
+Pending : 
+1) Adding followerCount and followeeCount, on the way when someone follows.
+2) 

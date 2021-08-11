@@ -1,38 +1,40 @@
-import {
-  BeforeInsert,
-  Entity,
-  Column,
-} from 'typeorm';
+import { BeforeInsert, Entity, Column, OneToMany } from 'typeorm';
 import { FakeBaseEntity } from '../commons/base.entity';
 
 import * as bcrypt from 'bcryptjs';
+import { UserFollowing } from './users-follow.entity';
 
 @Entity('users')
 export class User extends FakeBaseEntity {
-
-  @Column({ nullable: false, length: 50, unique : true })
+  @Column({ nullable: false, length: 50, unique: true })
   userName: string;
 
-  @Column({ nullable: false, length: 50, unique : true })
+  @Column({ nullable: false, length: 50, unique: true })
   email: string;
 
   @Column({ nullable: false })
   password: string;
 
   @Column({ nullable: true, length: 50 })
-  bio ?: string;
+  bio?: string;
 
   @Column({ nullable: true, length: 50 })
-  avatar ?: string;
+  avatar?: string;
 
-  @Column({ name : 'follower_count', default : 0 })
+  @Column({ name: 'follower_count', default: 0 })
   followerCount: number;
 
-  @Column({ name : 'followee_count', default : 0 })
+  @Column({ name: 'followee_count', default: 0 })
   followeeCount: number;
 
   @Column('boolean', { default: false })
-  verified : boolean;
+  verified: boolean;
+
+  @OneToMany(() => UserFollowing, (userFollowing) => userFollowing.followee)
+  followers: User[];
+
+  @OneToMany(() => UserFollowing, (userFollowing) => userFollowing.follower)
+  followees: User[];
 
   @BeforeInsert()
   async hashPassword() {

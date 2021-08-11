@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { User } from './users/users.entity';
 import { AuthModule } from './auth/auth.module';
 import { UserFollowing } from './users/users-follow.entity';
+import { UserFollowSubscriber } from './users/subscribers/user-follow.subscriber';
 
 
 @Module({
