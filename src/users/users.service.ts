@@ -73,24 +73,9 @@ export class UsersService {
     // const info = await this.userRepo
     //   .createQueryBuilder('user')
     //   .select()
-    //   .leftJoinAndSelect(
-    //     UserFollowing,
-    //     'followers',
-    //     'followers.follower_id = user.id',
-    //   )
-    //   // .leftJoinAndSelect(
-    //   //   UserFollowing,
-    //   //   'followees',
-    //   //   'followees.followee_id = user.id',
-    //   // )
-    //   .where('user.id = :userid', { userid })
-    //   .getMany();
-
-    // const info = await this.userRepo
-    //   .createQueryBuilder('user')
-    //   .select()
     //   .leftJoinAndSelect('user.followers', 'followers')
     //   .leftJoinAndSelect('user.followees', 'followees')
+    //   .addSelect('followers', 'followees')
     //   .where('user.id = :userid', { userid })
     //   .getMany();
 
@@ -98,8 +83,12 @@ export class UsersService {
       where: {
         id: userid,
       },
-      relations : [ 'followers', 'followees']
-      // relations: ['followers','followers.follower_id','followees','followees.followee_id'],
+      relations: [
+        'followers',
+        'followees',
+        'followers.follower',
+        'followees.followee',
+      ],
     });
 
     return info;

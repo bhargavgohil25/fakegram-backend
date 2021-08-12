@@ -1,12 +1,38 @@
-import { Expose, Type } from "class-transformer";
+import { Expose, Type, Transform } from "class-transformer";
 import { User } from "../users.entity";
 
+class follower {
+  @Expose()
+  id : string;
+
+  @Expose()
+  userName : string;
+
+  @Expose()
+  email : string;
+
+  @Expose()
+  bio : string;
+
+  @Expose()
+  avatar : string;
+
+  @Expose()
+  followerCount : number;
+
+  @Expose()
+  followeeCount : number;
+}
+
 class mock {
-  @Expose() id : string;
-  @Expose() createdAt : Date;
-  @Expose() updatedAt : Date;
-  @Expose() name : string;
-  @Expose() avatar : string;
+
+  @Expose()
+  @Type(() => follower)
+  follower : Partial<User>;
+
+  @Expose()
+  @Type(() => follower)
+  followee : Partial<User>;
 }
 
 export class UserDto {
@@ -36,10 +62,10 @@ export class UserDto {
 
   @Expose()
   @Type(() => mock)
-  followers : Array<User>;
+  followers : Array<any>;
 
   @Expose()
   @Type(() => mock)
-  followees : Array<User>;
+  followees : Array<any>;
 }
 
