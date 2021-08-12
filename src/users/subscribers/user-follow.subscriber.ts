@@ -22,7 +22,7 @@ export class UserFollowSubscriber implements EntitySubscriberInterface<User> {
 
   async afterInsert(event : InsertEvent<User>) {
 
-    console.log(`Before Update : `, event.entity);
+    // console.log(`Before Update : `, event.entity);
 
 
 

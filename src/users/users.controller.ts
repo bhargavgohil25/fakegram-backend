@@ -11,11 +11,20 @@ import {
   Put,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+// Interceptors
 import { Serialize } from '../interceptors/serialize.interceptor';
+
+// Decorators
 import { CurrentUser } from './decorator/current-user.decorator';
+
+// Dto's
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserDto } from './dto/user.dto';
+
+// Entities
 import { User } from './users.entity';
+
+// Services
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -23,36 +32,52 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
+  /*
+  * @Body(CreateUserDto)
+  * @Description(signups a new user)
+  */
+
   @Post('/signup')
   create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.usersService.create(createUserDto);
   }
 
+  /*
+  * @Params(userid : string)
+  * @Description(followers a user with id = userid)
+  * @Returns(followedUser : User)
+  */
+
   @Put('/:userid/follow')
   @UseGuards(JwtAuthGuard)
   async followUser(
-    @CurrentUser() follower : User,
-    @Param('userid') followeeId : string 
+    @CurrentUser() follower: User,
+    @Param('userid') followeeId: string,
   ) {
     const followedUser = await this.usersService.createUserFollowRelation(
       follower,
-      followeeId
+      followeeId,
     );
 
     return followedUser;
   }
 
+  /*
+  * @Params(userid : string)
+  * @Description(gets all the following Info of a user with id = userid)
+  * @Returns(followingInfo : Array<User>)
+  */
+
   @Get('/:userid/followinfo')
-  async followInfo(@Param('userid') userid : string) {
+  async followInfo(@Param('userid') userid: string) {
     const result = await this.usersService.getUserFollowInfo(userid);
-    console.log(result)
     return result;
   }
 
   //! Testing for current user
   @Get('/current')
   @UseGuards(JwtAuthGuard)
-  async getCurrentUserId(@CurrentUser() user : User) {
+  async getCurrentUserId(@CurrentUser() user: User) {
     console.log('running endpoint');
     return user;
   }
@@ -79,6 +104,4 @@ export class UsersController {
 
     return user;
   }
-
-  
 }

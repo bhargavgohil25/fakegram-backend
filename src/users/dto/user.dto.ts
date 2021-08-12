@@ -1,10 +1,10 @@
-import { Expose } from "class-transformer";
+import { Expose, Type } from "class-transformer";
 import { User } from "../users.entity";
 
-interface mock {
-  id : string;
-  createdAt : Date;
-  updatedAt : Date;
+class mock {
+  @Expose() id : string;
+  @Expose() createdAt : Date;
+  @Expose() updatedAt : Date;
 }
 
 export class UserDto {
@@ -33,9 +33,11 @@ export class UserDto {
   verified : boolean;
 
   @Expose()
-  followers : Array<mock | User>;
+  @Type(() => mock)
+  followers : Array<User>;
 
   @Expose()
-  followees : Array<mock | User>;
+  @Type(() => mock)
+  followees : Array<User>;
 }
 

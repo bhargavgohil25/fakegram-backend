@@ -41,6 +41,12 @@ export class User extends FakeBaseEntity {
     this.password = await bcrypt.hash(this.password, 8);
   }
 
+  // withoutPassword() {
+  //   return Object.fromEntries(
+  //     Object.entries(this).filter(([key, val]) => key !== 'password')
+  //   );
+  // }
+
   // async validatePassword(password: string): Promise<boolean> {
   //   return bcrypt.compare(password, this.password);
   // }

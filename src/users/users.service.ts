@@ -71,7 +71,7 @@ export class UsersService {
   */
 
   public async getUserFollowInfo(userid: string) {
-    
+
     const info = await this.userRepo
       .createQueryBuilder('userFollowing')
       .select()
@@ -80,7 +80,7 @@ export class UsersService {
       .where('userFollowing.id = :userid', { userid })
       .getMany()
 
-    return info;
+    return info
   }
 
   // public async getProfile(username: string) {
