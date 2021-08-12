@@ -22,7 +22,7 @@ export class UsersService {
     private jwtService: JwtService,
   ) {}
 
-  /*
+  /**
    * Create an Account
    * @Body(CreateUserDto)
    */
@@ -46,7 +46,7 @@ export class UsersService {
     return newUser;
   }
 
-  /*
+  /**
    *  Create user- user relation
    *  @Param(userId) : To whom we are following
    */
@@ -65,22 +65,44 @@ export class UsersService {
     return newFollowee.followee;
   }
 
-  /*
-  * @Description: Followers and Followees of a Particular User
-  * @Param(UserId) : Of whom we want to know the followers and followees
-  */
-
+  /**
+   * @Description: Followers and Followees of a Particular User
+   * @Param(UserId) : Of whom we want to know the followers and followees
+   */
   public async getUserFollowInfo(userid: string) {
+    // const info = await this.userRepo
+    //   .createQueryBuilder('user')
+    //   .select()
+    //   .leftJoinAndSelect(
+    //     UserFollowing,
+    //     'followers',
+    //     'followers.follower_id = user.id',
+    //   )
+    //   // .leftJoinAndSelect(
+    //   //   UserFollowing,
+    //   //   'followees',
+    //   //   'followees.followee_id = user.id',
+    //   // )
+    //   .where('user.id = :userid', { userid })
+    //   .getMany();
 
-    const info = await this.userRepo
-      .createQueryBuilder('userFollowing')
-      .select()
-      .leftJoinAndSelect('userFollowing.followers','followers')
-      .leftJoinAndSelect('userFollowing.followees', 'followees')
-      .where('userFollowing.id = :userid', { userid })
-      .getMany()
+    // const info = await this.userRepo
+    //   .createQueryBuilder('user')
+    //   .select()
+    //   .leftJoinAndSelect('user.followers', 'followers')
+    //   .leftJoinAndSelect('user.followees', 'followees')
+    //   .where('user.id = :userid', { userid })
+    //   .getMany();
 
-    return info
+    const info = this.userRepo.find({
+      where: {
+        id: userid,
+      },
+      relations : [ 'followers', 'followees']
+      // relations: ['followers','followers.follower_id','followees','followees.followee_id'],
+    });
+
+    return info;
   }
 
   // public async getProfile(username: string) {

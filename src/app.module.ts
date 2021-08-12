@@ -8,6 +8,7 @@ import { User } from './users/users.entity';
 import { AuthModule } from './auth/auth.module';
 import { UserFollowing } from './users/users-follow.entity';
 import { UserFollowSubscriber } from './users/subscribers/user-follow.subscriber';
+import { PostsModule } from './posts/posts.module';
 
 
 @Module({
@@ -27,6 +28,7 @@ import { UserFollowSubscriber } from './users/subscribers/user-follow.subscriber
     }),
     UsersModule,
     AuthModule,
+    PostsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

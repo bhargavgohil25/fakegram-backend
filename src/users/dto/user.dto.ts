@@ -5,6 +5,8 @@ class mock {
   @Expose() id : string;
   @Expose() createdAt : Date;
   @Expose() updatedAt : Date;
+  @Expose() name : string;
+  @Expose() avatar : string;
 }
 
 export class UserDto {

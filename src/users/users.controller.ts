@@ -32,7 +32,7 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
-  /*
+  /**
   * @Body(CreateUserDto)
   * @Description(signups a new user)
   */
@@ -42,7 +42,7 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  /*
+  /**
   * @Params(userid : string)
   * @Description(followers a user with id = userid)
   * @Returns(followedUser : User)
@@ -62,7 +62,7 @@ export class UsersController {
     return followedUser;
   }
 
-  /*
+  /**
   * @Params(userid : string)
   * @Description(gets all the following Info of a user with id = userid)
   * @Returns(followingInfo : Array<User>)

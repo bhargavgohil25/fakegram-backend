@@ -1,4 +1,4 @@
-import { BeforeInsert, Entity, Column, OneToMany } from 'typeorm';
+import { BeforeInsert, Entity, Column, OneToMany, AfterLoad } from 'typeorm';
 import { FakeBaseEntity } from '../commons/base.entity';
 
 import * as bcrypt from 'bcryptjs';
@@ -41,6 +41,15 @@ export class User extends FakeBaseEntity {
     this.password = await bcrypt.hash(this.password, 8);
   }
 
+  // @AfterLoad()
+  // getFollowerCount() {
+  //   this.followerCount = this.followers.length;
+  // }
+
+  // @AfterLoad()
+  // getFolloweeCount() {
+  //   this.followeeCount = this.followees.length;
+  // }
   // withoutPassword() {
   //   return Object.fromEntries(
   //     Object.entries(this).filter(([key, val]) => key !== 'password')
