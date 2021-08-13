@@ -1,8 +1,9 @@
-import { BeforeInsert, Entity, Column, OneToMany, AfterLoad } from 'typeorm';
+import { BeforeInsert, Entity, Column, OneToMany, AfterLoad, AfterUpdate, BeforeUpdate } from 'typeorm';
 import { FakeBaseEntity } from '../commons/base.entity';
 
 import * as bcrypt from 'bcryptjs';
 import { UserFollowing } from './users-follow.entity';
+import { Post } from '../posts/posts.entity';
 
 @Entity('users')
 export class User extends FakeBaseEntity {
@@ -36,11 +37,14 @@ export class User extends FakeBaseEntity {
   @OneToMany(() => UserFollowing, (userFollowing) => userFollowing.follower)
   followees: User[];
 
+  @OneToMany(() => Post, (post) => post.author)
+  posts : Post[]
+
   @BeforeInsert()
+  @BeforeUpdate()
   async hashPassword() {
     this.password = await bcrypt.hash(this.password, 8);
   }
-
   // @AfterLoad()
   // getFollowerCount() {
   //   this.followerCount = this.followers.length;

@@ -11,6 +11,7 @@ import { getManager, getRepository, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { UserFollowing } from './users-follow.entity';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -23,8 +24,8 @@ export class UsersService {
   ) {}
 
   /**
-   * Create an Account
-   * @Body(CreateUserDto)
+   * @Description Create an Account
+   * @Body (CreateUserDto)
    */
 
   async create(createUserDto: CreateUserDto) {
@@ -47,14 +48,18 @@ export class UsersService {
   }
 
   /**
-   *  Create user- user relation
-   *  @Param(userId) : To whom we are following
+   *  @description Create user- user relation
+   *  @Param (userId) : To whom we are following
    */
   public async createUserFollowRelation(follower: User, followeeId: string) {
     const followee = await this.findById(followeeId);
 
     if (!followee) {
       throw new NotFoundException('User Not Found');
+    }
+
+    if(followee.id === follower.id){
+      throw new BadRequestException("You cannot follow yourself")
     }
 
     const newFollowee = await this.userFollowingRepo.save({
@@ -66,18 +71,10 @@ export class UsersService {
   }
 
   /**
-   * @Description: Followers and Followees of a Particular User
-   * @Param(UserId) : Of whom we want to know the followers and followees
+   * @Description Followers and Followees of a Particular User
+   * @Param (UserId) Of whom we want to know the followers and followees
    */
   public async getUserFollowInfo(userid: string) {
-    // const info = await this.userRepo
-    //   .createQueryBuilder('user')
-    //   .select()
-    //   .leftJoinAndSelect('user.followers', 'followers')
-    //   .leftJoinAndSelect('user.followees', 'followees')
-    //   .addSelect('followers', 'followees')
-    //   .where('user.id = :userid', { userid })
-    //   .getMany();
 
     const info = this.userRepo.find({
       where: {
@@ -90,17 +87,42 @@ export class UsersService {
         'followees.followee',
       ],
     });
-
     return info;
   }
 
-  // public async getProfile(username: string) {
-  //   const user = await this.userRepo
-  //     .createQueryBuilder()
-  //     .select('*')
-  //     .from(User, 'users')
-  //     // .leftJoinAndSelect();
-  // }
+  /**
+   * @Description Update the Profile (only the owner of the profile can update)
+   * @Body (UpdateUserDto) 
+   * @param (userid)
+  */
+  public async updateUserProfile(userid : string , newUserDetail : UpdateUserDto) {
+    const existingUser = await this.findById(userid)
+
+    if(!existingUser){
+      return null;
+    }
+
+    const present = await this.findByName(newUserDetail.userName);
+
+    if(present) {
+      throw new BadRequestException("This username is already taken, take another username")
+    }
+
+    if(newUserDetail.userName){
+      existingUser.userName = newUserDetail.userName
+    }
+    if(newUserDetail.bio){
+      existingUser.bio = newUserDetail.bio;
+    }
+    if(newUserDetail.avatar){
+      existingUser.avatar = newUserDetail.avatar;
+    }
+    if(newUserDetail.password){
+      existingUser.password = newUserDetail.password;
+    }
+
+    return await this.userRepo.save(existingUser);
+  }
 
   async showById(id: number) {
     const user = await this.userRepo.findOne(id);
@@ -149,6 +171,10 @@ export class UsersService {
     await this.userRepo.delete(id);
   }
 
+  /**
+   *  @Description Validate the database password and provided from user.
+   * @Params password : string, email : string
+  */
   async validatePassword(password: string, email: string): Promise<boolean> {
     const user = await this.findByEmail(email);
     const currPassword = user.password;

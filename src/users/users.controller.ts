@@ -19,6 +19,7 @@ import { CurrentUser } from './decorator/current-user.decorator';
 
 // Dto's
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
 
 // Entities
@@ -33,9 +34,9 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   /**
-  * @Body(CreateUserDto)
-  * @Description(signups a new user)
-  */
+   * @Body(CreateUserDto)
+   * @Description(signups a new user)
+   */
 
   @Post('/signup')
   create(@Body() createUserDto: CreateUserDto): Promise<User> {
@@ -43,10 +44,10 @@ export class UsersController {
   }
 
   /**
-  * @Params(userid : string)
-  * @Description(followers a user with id = userid)
-  * @Returns(followedUser : User)
-  */
+   * @Params(userid : string)
+   * @Description(followers a user with id = userid)
+   * @Returns(followedUser : User)
+   */
 
   @Put('/:userid/follow')
   @UseGuards(JwtAuthGuard)
@@ -63,15 +64,26 @@ export class UsersController {
   }
 
   /**
-  * @Params(userid : string)
-  * @Description(gets all the following Info of a user with id = userid)
-  * @Returns(followingInfo : Array<User>)
-  */
+   * @Params(userid : string)
+   * @Description(gets all the following Info of a user with id = userid)
+   * @Returns(followingInfo : Array<User>)
+   */
 
   @Get('/:userid/followinfo')
   async followInfo(@Param('userid') userid: string) {
     const result = await this.usersService.getUserFollowInfo(userid);
     return result;
+  }
+
+  @Patch('/updateprofile')
+  @UseGuards(JwtAuthGuard)
+  async updateUserProfile(
+    @CurrentUser() user : User,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<User> {
+    const resUser = this.usersService.updateUserProfile(user.id, updateUserDto);
+
+    return resUser;
   }
 
   //! Testing for current user

@@ -33,6 +33,7 @@ export class UsersModule {
       '**/current',
       { path : '/users/@:userName', method: RequestMethod.GET },
       { path : '/users/:userid/follow', method: RequestMethod.PUT },
+      { path : '/users/updateprofile', method: RequestMethod.PATCH },
       // '*'
     );
   }
