@@ -24,17 +24,17 @@ import { UserFollowSubscriber } from './subscribers/user-follow.subscriber';
     }),
   ],
   controllers: [UsersController],
-  providers: [UsersService, JwtStrategy, UserFollowSubscriber],
+  providers: [UsersService, JwtStrategy],
   exports: [UsersService],
 })
 export class UsersModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(CurrentUserMiddleware).forRoutes(
-      '**/current',
-      { path : '/users/@:userName', method: RequestMethod.GET },
-      { path : '/users/:userid/follow', method: RequestMethod.PUT },
-      { path : '/users/updateprofile', method: RequestMethod.PATCH },
-      // '*'
-    );
-  }
+  // configure(consumer: MiddlewareConsumer) {
+  //   consumer.apply(CurrentUserMiddleware).forRoutes(
+  //     '**/current',
+  //     { path : '/users/@:userName', method: RequestMethod.GET },
+  //     { path : '/users/:userid/follow', method: RequestMethod.PUT },
+  //     { path : '/users/updateprofile', method: RequestMethod.PATCH },
+  //     // '*'
+  //   );
+  // }
 }

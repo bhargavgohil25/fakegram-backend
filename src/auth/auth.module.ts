@@ -22,6 +22,7 @@ import { AuthMiddleware } from './middlewares/auth.middleware';
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
+  exports : [AuthService]
 })
 export class AuthModule {
   configure(consumer: MiddlewareConsumer) {

@@ -1,4 +1,12 @@
-import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Hashtags } from 'src/hashtags/hashtags.entity';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 import { FakeBaseEntity } from '../commons/base.entity';
 import { User } from '../users/users.entity';
 
@@ -8,16 +16,12 @@ class Mention {
 }
 
 @Entity('posts')
-export class Post extends FakeBaseEntity {
+export class Posts extends FakeBaseEntity {
   @Column({ length: 200, nullable: true })
   caption: string;
 
-  @Column('json', { default: [] })
+  @Column('text', { array: true, default: [] })
   images: Array<string>;
-
-  @ManyToOne(() => User, (user) => user.posts)
-  @JoinColumn({ name: 'author_id' })
-  author: User;
 
   @Column({ name: 'like_count', default: 0 })
   likeCount: number;
@@ -25,12 +29,16 @@ export class Post extends FakeBaseEntity {
   @Column({ name: 'repost_count', default: 0 })
   repostCount: number;
 
-  @Column('json', { default: [] })
-  hashTags: Array<string>;
+  @ManyToMany(() => Hashtags, (hashtags) => hashtags.posts, { eager: true })
+  @JoinTable({ name: 'posts_hashtags_relation' })
+  hashtags: Hashtags[];
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'author_id' })
+  author: User;
 
   @Column('json', { default: [] })
   mentions: Array<Mention>;
 
-  @Column()
-  comments : string;
+  // TODO : comments database section
 }

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -8,7 +8,10 @@ import { User } from './users/users.entity';
 import { AuthModule } from './auth/auth.module';
 import { UserFollowing } from './users/users-follow.entity';
 import { PostsModule } from './posts/posts.module';
-import { Post } from './posts/posts.entity';
+import { Posts } from './posts/posts.entity';
+import { CurrentUserMiddleware } from './users/middlewares/current-user.middleware';
+import { HashtagsModule } from './hashtags/hashtags.module';
+import { Hashtags } from './hashtags/hashtags.entity';
 
 
 @Module({
@@ -23,14 +26,26 @@ import { Post } from './posts/posts.entity';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [User, UserFollowing, Post],
+      entities: [User, UserFollowing, Posts, Hashtags],
       synchronize: true,
     }),
     UsersModule,
     AuthModule,
     PostsModule,
+    HashtagsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(CurrentUserMiddleware).forRoutes(
+      '**/current',
+      { path : '/users/@:userName', method: RequestMethod.GET },
+      { path : '/users/:userid/follow', method: RequestMethod.PUT },
+      { path : '/users/updateprofile', method: RequestMethod.PATCH },
+      { path : '/posts/', method: RequestMethod.POST }
+      // '*'
+    );
+  }
+}
