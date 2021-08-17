@@ -1,44 +1,56 @@
 import { Expose, Type } from 'class-transformer';
+import { Hashtags } from 'src/hashtags/hashtags.entity';
 import { User } from 'src/users/users.entity';
 
 class authorMock {
   @Expose()
-  id : string;
+  id: string;
 
   @Expose()
-  userName : string;
+  userName: string;
 
   @Expose()
-  email : string;
+  email: string;
 
   @Expose()
-  bio : string;
+  bio: string;
 
   @Expose()
-  verified : boolean;
+  verified: boolean;
+}
+
+class hashtagMock {
+  @Expose()
+  id: string;
+
+  @Expose()
+  hashtag: string;
 }
 
 export class ReturnPostData {
-
   @Expose()
   @Type(() => authorMock)
-  author : User;
+  author: User;
 
   @Expose()
   caption: string;
- 
-  @Expose()
-  mentions : Array<string>;
 
   @Expose()
-  images : Array<string>;
+  mentions: Array<string>;
 
   @Expose()
-  likesCount : number;
+  images: Array<string>;
 
   @Expose()
-  createdAt : Date;
+  likesCount: number;
 
   @Expose()
-  updatedAt : Date;
+  @Type(() => hashtagMock)
+  hashtags: Array<Hashtags>;
+
+  @Expose()
+  createdAt: Date;
+
+  @Expose()
+  updatedAt: Date;
 }

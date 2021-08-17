@@ -20,32 +20,37 @@ export class PostsService {
 
   /**
    * @description create a new post
-   * @Param {User} user - author of the post
-   * @Param body - CreatePostDto
+   * @param {User} user - author of the post
+   * @param body - CreatePostDto
+   * @returns {Promise<Posts> Post
    */
 
-  async createPost(creator : User, body: CreatePostDto) {
+  async createPost(creator: User, body: CreatePostDto) {
     if (!body.caption) {
       throw new BadRequestException('Post must contain some text');
     }
 
     // Extract hashtags from the post caption body
     const hashtags = body.caption.match(/\#\w+/g); // hashtags are the array of all hashtags in the post caption
-    let hashtagsEntities : Array<Hashtags> = []; 
+    let hashtagsEntities: Array<Hashtags> = [];
 
     // saving all the hashtags in the hashtag table.
-    if(hashtags){
+    if (hashtags) {
       for (const hashtag of hashtags) {
-        const hashtagEntity = await this.hashtagRepo.findOne({ hashtag });
+        const hashtagEntity : Hashtags = await this.hashtagRepo.findOne({ hashtag });
         // Check if there is any hashtag with the same name
+        let newHashtag : Hashtags;
         if (!hashtagEntity) {
-          const newHashtag = await this.hashtagRepo.save({ hashtag });
-          hashtagsEntities.push(newHashtag)
+          newHashtag = await this.hashtagRepo.save({ hashtag });
+          hashtagsEntities.push(newHashtag);
+        }else{
+          hashtagsEntities.push(hashtagEntity);
         }
       }
     }
-    
+
     const post = new Posts();
+    // const post = this.postsRepo.create();
     post.author = creator;
     post.caption = body.caption;
     post.images = body.images;
@@ -56,12 +61,24 @@ export class PostsService {
     return resPost;
   }
 
+  /**
+   * @description get all the posts of user
+   * @param {userid} userid
+   * @returns {Promise<Posts[]> Posts[]
+  */
+
   async getPostsByUserId(userid: string) {
-    const posts = await this.postsRepo.find({
-      where: {
-        author: userid,
-      },
-    });
-    return posts;
+    const posts = await this.postsRepo
+      .createQueryBuilder('posts')
+      .leftJoinAndSelect('posts.author', 'author')
+      .leftJoinAndSelect('posts.hashtags', 'hashtag')
+      .addSelect('hashtag.hashtag')
+      .where('posts.author = :userid', { userid });
+
+    return posts
+      .addSelect('posts.created_at')
+      .orderBy('posts.created_at', 'DESC')
+      .limit(100)
+      .getMany();
   }
 }

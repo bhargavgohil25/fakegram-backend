@@ -5,6 +5,7 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   ManyToMany,
+  JoinTable,
 } from 'typeorm';
 
 @Entity('hashtags')
@@ -17,7 +18,6 @@ export class Hashtags {
 
   @ManyToMany(() => Posts, (post) => post.hashtags, {
     eager: false,
-    cascade: true,
   })
   posts: Posts[];
 

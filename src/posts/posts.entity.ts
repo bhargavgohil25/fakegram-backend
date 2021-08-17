@@ -29,9 +29,22 @@ export class Posts extends FakeBaseEntity {
   @Column({ name: 'repost_count', default: 0 })
   repostCount: number;
 
-  @ManyToMany(() => Hashtags, (hashtags) => hashtags.posts, { eager: true })
-  @JoinTable({ name: 'posts_hashtags_relation' })
-  hashtags: Hashtags[];
+  @ManyToMany(() => Hashtags, (hashtags) => hashtags.posts, {
+    cascade: true,
+    eager: true,
+  })
+  @JoinTable({
+    name: 'posts_hashtags_relation',
+    joinColumn: {
+      name: 'post_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'hashtag_id',
+      referencedColumnName: 'id',
+    },
+  })
+  hashtags: Array<Hashtags>;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'author_id' })

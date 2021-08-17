@@ -54,7 +54,7 @@ export class UsersController {
   async followUser(
     @CurrentUser() follower: User,
     @Param('userid') followeeId: string,
-  ) {
+  ) : Promise<User> {
     const followedUser = await this.usersService.createUserFollowRelation(
       follower,
       followeeId,
@@ -106,7 +106,7 @@ export class UsersController {
   }
 
   @Get('/:id')
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async getUserById(@Param('id') id: string) {
     const user = await this.usersService.findById(id);
 
