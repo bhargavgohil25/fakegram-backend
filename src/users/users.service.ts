@@ -7,7 +7,7 @@ import {
 import { User } from './users.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { getManager, getRepository, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { UserFollowing } from './users-follow.entity';
@@ -23,11 +23,14 @@ export class UsersService {
     private jwtService: JwtService,
   ) {}
 
+  
+  validate(userName: string) {
+    return /^[a-zA-Z0-9_]+$/.test(userName);
+  }
   /**
    * @Description Create an Account
    * @Body (CreateUserDto)
    */
-
   async create(createUserDto: CreateUserDto) {
     const findUser = await this.findByEmail(createUserDto.email);
 
@@ -39,6 +42,11 @@ export class UsersService {
 
     if (findUserByName) {
       throw new BadRequestException('Username already Exist');
+    }
+
+    const userName = createUserDto.userName;
+    if(!this.validate(userName)) {
+      throw new BadRequestException('Username should contain only numbers, alphabets and underscore');
     }
 
     const user = this.userRepo.create(createUserDto);
@@ -75,17 +83,6 @@ export class UsersService {
    * @Param (UserId) Of whom we want to know the followers and followees
    */
   public async getUserFollowInfo(userid: string) {
-    // const info = this.userRepo.find({
-    //   where: {
-    //     id: userid,
-    //   },
-    //   relations: [
-    //     'followers',
-    //     'followees',
-    //     'followers.follower',
-    //     'followees.followee',
-    //   ],
-    // });
     const info = this.userRepo
       .createQueryBuilder('users')
       .leftJoinAndSelect('users.followers', 'followerstable')

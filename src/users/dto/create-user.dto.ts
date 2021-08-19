@@ -1,7 +1,14 @@
-import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsString, IsUUID } from 'class-validator';
+import { Transform } from 'class-transformer';
+import {
+  IsBoolean,
+  IsEmail,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  Validate,
+} from 'class-validator';
 
 export class CreateUserDto {
-
   @IsNotEmpty()
   @IsString()
   userName: string;
@@ -16,18 +23,17 @@ export class CreateUserDto {
   password: string;
 
   @IsString()
-  bio : string;
+  bio: string;
 
   @IsString()
-  avatar : string;
+  avatar: string;
 
   @IsNumber()
-  followerCount : number;
+  followerCount: number;
 
   @IsNumber()
-  followeeCount : number;
+  followeeCount: number;
 
   @IsBoolean()
-  verified : boolean;
-
+  verified: boolean;
 }

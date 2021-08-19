@@ -61,12 +61,12 @@ export class UserDto {
   verified : boolean;
 
   @Expose()
-  @Transform(({ obj }) => obj.followers.follower)
-  // @Type(() => mock)
-  followers : Array<any>;
+  // @Transform(({ obj }) => obj.followers.follower)
+  @Type(() => mock)
+  followers : Array<User>;
 
   @Expose()
   @Type(() => mock)
-  followees : Array<any>;
+  followees : Array<User>;
 }
 

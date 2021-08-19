@@ -72,7 +72,7 @@ export class UsersController {
    */
 
   @Get('/:userid/followinfo')
-  // @Serialize(UserDto)
+  @Serialize(UserDto)
   async followInfo(@Param('userid') userid: string) {
     const result = await this.usersService.getUserFollowInfo(userid);
     return result;
