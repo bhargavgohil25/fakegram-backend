@@ -8,6 +8,7 @@ import { Posts } from './posts.entity';
 import { Hashtags } from '../hashtags/hashtags.entity';
 // Dto's
 import { CreatePostDto } from './dto/create-post.dto';
+import { Likes } from '../likes/likes.entity';
 
 @Injectable()
 export class PostsService {
@@ -72,6 +73,8 @@ export class PostsService {
       .createQueryBuilder('posts')
       .leftJoinAndSelect('posts.author', 'author')
       .leftJoinAndSelect('posts.hashtags', 'hashtag')
+      .leftJoinAndSelect('posts.likes', 'likes')
+      .leftJoinAndSelect('likes.user', 'users')
       .addSelect('hashtag.hashtag')
       .where('posts.author = :userid', { userid });
 
@@ -81,4 +84,19 @@ export class PostsService {
       .limit(100)
       .getMany();
   }
+
+  /**
+   * @description get a single post by its id
+  */
+
+  async getPostsById(postid : string) : Promise<Posts> {
+    const post = await this.postsRepo.findOne({
+      where : {
+        id : postid
+      }
+    })
+
+    return post;
+  }
+
 }

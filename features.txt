@@ -13,4 +13,4 @@
 
 Pending : 
 1) Adding followerCount and followeeCount, on the way when someone follows.
-2) 
+2) Get all the posts of the people whom he is following, (all posts of the followee)

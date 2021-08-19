@@ -12,6 +12,8 @@ import { Posts } from './posts/posts.entity';
 import { CurrentUserMiddleware } from './users/middlewares/current-user.middleware';
 import { HashtagsModule } from './hashtags/hashtags.module';
 import { Hashtags } from './hashtags/hashtags.entity';
+import { LikesModule } from './likes/likes.module';
+import { Likes } from './likes/likes.entity';
 
 
 @Module({
@@ -26,13 +28,14 @@ import { Hashtags } from './hashtags/hashtags.entity';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [User, UserFollowing, Posts, Hashtags],
+      entities: [User, UserFollowing, Posts, Hashtags, Likes],
       synchronize: true,
     }),
     UsersModule,
     AuthModule,
     PostsModule,
     HashtagsModule,
+    LikesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
@@ -44,7 +47,8 @@ export class AppModule {
       { path : '/users/@:userName', method: RequestMethod.GET },
       { path : '/users/:userid/follow', method: RequestMethod.PUT },
       { path : '/users/updateprofile', method: RequestMethod.PATCH },
-      { path : '/posts/', method: RequestMethod.POST }
+      { path : '/posts/', method: RequestMethod.POST },
+      { path : '/posts/like', method: RequestMethod.POST }
       // '*'
     );
   }

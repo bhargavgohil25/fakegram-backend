@@ -1,4 +1,5 @@
 import { Hashtags } from 'src/hashtags/hashtags.entity';
+import { Likes } from '../likes/likes.entity';
 import {
   Entity,
   Column,
@@ -6,6 +7,7 @@ import {
   JoinColumn,
   ManyToMany,
   JoinTable,
+  OneToMany,
 } from 'typeorm';
 import { FakeBaseEntity } from '../commons/base.entity';
 import { User } from '../users/users.entity';
@@ -45,6 +47,9 @@ export class Posts extends FakeBaseEntity {
     },
   })
   hashtags: Array<Hashtags>;
+
+  @OneToMany(() => Likes, (like) => like.post)
+  likes: Likes[];
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'author_id' })

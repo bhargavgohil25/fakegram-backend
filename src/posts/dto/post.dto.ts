@@ -19,6 +19,18 @@ class authorMock {
   verified: boolean;
 }
 
+class authorMock2 {
+  @Expose()
+  id : string;
+
+  @Expose()
+  createdAt : Date;
+
+  @Expose()
+  @Type(() => authorMock)
+  user : User;
+}
+
 class hashtagMock {
   @Expose()
   id: string;
@@ -47,6 +59,10 @@ export class ReturnPostData {
   @Expose()
   @Type(() => hashtagMock)
   hashtags: Array<Hashtags>;
+
+  @Expose()
+  @Type(() => authorMock2)
+  likes: Array<User>;
 
   @Expose()
   createdAt: Date;

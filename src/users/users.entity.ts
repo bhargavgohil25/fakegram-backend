@@ -4,6 +4,7 @@ import { FakeBaseEntity } from '../commons/base.entity';
 import * as bcrypt from 'bcryptjs';
 import { UserFollowing } from './users-follow.entity';
 import { Posts } from '../posts/posts.entity';
+import { Likes } from '../likes/likes.entity';
 
 @Entity('users')
 export class User extends FakeBaseEntity {
@@ -39,6 +40,9 @@ export class User extends FakeBaseEntity {
 
   @OneToMany(() => Posts, (post) => post.author)
   posts : Posts[];
+
+  @OneToMany(() => Likes, (like) => like.user)
+  likes : Likes[]
 
   @BeforeInsert()
   @BeforeUpdate()
