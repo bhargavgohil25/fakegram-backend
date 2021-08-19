@@ -58,8 +58,8 @@ export class UsersService {
       throw new NotFoundException('User Not Found');
     }
 
-    if(followee.id === follower.id){
-      throw new BadRequestException("You cannot follow yourself")
+    if (followee.id === follower.id) {
+      throw new BadRequestException('You cannot follow yourself');
     }
 
     const newFollowee = await this.userFollowingRepo.save({
@@ -75,49 +75,58 @@ export class UsersService {
    * @Param (UserId) Of whom we want to know the followers and followees
    */
   public async getUserFollowInfo(userid: string) {
-
-    const info = this.userRepo.find({
-      where: {
-        id: userid,
-      },
-      relations: [
-        'followers',
-        'followees',
-        'followers.follower',
-        'followees.followee',
-      ],
-    });
+    // const info = this.userRepo.find({
+    //   where: {
+    //     id: userid,
+    //   },
+    //   relations: [
+    //     'followers',
+    //     'followees',
+    //     'followers.follower',
+    //     'followees.followee',
+    //   ],
+    // });
+    const info = this.userRepo
+      .createQueryBuilder('users')
+      .leftJoinAndSelect('users.followers', 'followerstable')
+      .leftJoinAndSelect('followerstable.follower', 'followers')
+      .leftJoinAndSelect('users.followees', 'followeestable')
+      .leftJoinAndSelect('followeestable.followee', 'followees')
+      .where('users.id = :id', { id: userid })
+      .getMany();
     return info;
   }
 
   /**
    * @Description Update the Profile (only the owner of the profile can update)
-   * @Body (UpdateUserDto) 
+   * @Body (UpdateUserDto)
    * @param (userid)
-  */
-  public async updateUserProfile(userid : string , newUserDetail : UpdateUserDto) {
-    const existingUser = await this.findById(userid)
+   */
+  public async updateUserProfile(userid: string, newUserDetail: UpdateUserDto) {
+    const existingUser = await this.findById(userid);
 
-    if(!existingUser){
+    if (!existingUser) {
       return null;
     }
 
     const present = await this.findByName(newUserDetail.userName);
 
-    if(present) {
-      throw new BadRequestException("This username is already taken, take another username")
+    if (present) {
+      throw new BadRequestException(
+        'This username is already taken, take another username',
+      );
     }
 
-    if(newUserDetail.userName){
-      existingUser.userName = newUserDetail.userName
+    if (newUserDetail.userName) {
+      existingUser.userName = newUserDetail.userName;
     }
-    if(newUserDetail.bio){
+    if (newUserDetail.bio) {
       existingUser.bio = newUserDetail.bio;
     }
-    if(newUserDetail.avatar){
+    if (newUserDetail.avatar) {
       existingUser.avatar = newUserDetail.avatar;
     }
-    if(newUserDetail.password){
+    if (newUserDetail.password) {
       existingUser.password = newUserDetail.password;
     }
 
@@ -174,10 +183,28 @@ export class UsersService {
   /**
    *  @Description Validate the database password and provided from user.
    * @Params password : string, email : string
-  */
+   */
   async validatePassword(password: string, email: string): Promise<boolean> {
     const user = await this.findByEmail(email);
     const currPassword = user.password;
     return bcrypt.compare(password, currPassword);
+  }
+
+  /**
+   * @description get all the posts that are liked by the user
+   * @param (userId)
+   * @return (posts)
+   * @protected 🔒
+   */
+  async getLikedPosts(user: User) {
+    const posts = await this.userRepo
+      .createQueryBuilder('users')
+      .leftJoinAndSelect('users.likes', 'likes')
+      .leftJoinAndSelect('likes.post', 'posts')
+      .where('users.id = :userId', { userId: user.id })
+      .orderBy('likes.createdAt', 'DESC')
+      .getMany();
+
+    return posts;
   }
 }

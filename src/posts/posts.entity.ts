@@ -25,9 +25,6 @@ export class Posts extends FakeBaseEntity {
   @Column('text', { array: true, default: [] })
   images: Array<string>;
 
-  @Column({ name: 'like_count', default: 0 })
-  likeCount: number;
-
   @Column({ name: 'repost_count', default: 0 })
   repostCount: number;
 

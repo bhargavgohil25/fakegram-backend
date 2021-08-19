@@ -19,6 +19,7 @@ import { CurrentUser } from './decorator/current-user.decorator';
 
 // Dto's
 import { CreateUserDto } from './dto/create-user.dto';
+import { LikedPostDto } from './dto/liked-posts.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
 
@@ -29,16 +30,16 @@ import { User } from './users.entity';
 import { UsersService } from './users.service';
 
 @Controller('users')
-@Serialize(UserDto)
 export class UsersController {
   constructor(private usersService: UsersService) {}
-
+  
   /**
    * @Body(CreateUserDto)
    * @Description(signups a new user)
    */
-
+  
   @Post('/signup')
+  @Serialize(UserDto)
   create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.usersService.create(createUserDto);
   }
@@ -51,6 +52,7 @@ export class UsersController {
 
   @Put('/:userid/follow')
   @UseGuards(JwtAuthGuard)
+  @Serialize(UserDto)
   async followUser(
     @CurrentUser() follower: User,
     @Param('userid') followeeId: string,
@@ -70,6 +72,7 @@ export class UsersController {
    */
 
   @Get('/:userid/followinfo')
+  // @Serialize(UserDto)
   async followInfo(@Param('userid') userid: string) {
     const result = await this.usersService.getUserFollowInfo(userid);
     return result;
@@ -77,6 +80,7 @@ export class UsersController {
 
   @Patch('/updateprofile')
   @UseGuards(JwtAuthGuard)
+  @Serialize(UserDto)
   async updateUserProfile(
     @CurrentUser() user : User,
     @Body() updateUserDto: UpdateUserDto,
@@ -89,13 +93,15 @@ export class UsersController {
   //! Testing for current user
   @Get('/current')
   @UseGuards(JwtAuthGuard)
+  @Serialize(UserDto)
   async getCurrentUserId(@CurrentUser() user: User) {
     console.log('running endpoint');
     return user;
   }
 
   @Get('/@:userName')
-  async getUserByUsername(@Param('userName') userName: string) {
+  @Serialize(UserDto)
+  async getUserByUsername(@Param('userName') userName: string) : Promise<User> {
     const user = await this.usersService.findByName(userName);
     // console.log(userName);
     if (!user) {
@@ -105,9 +111,17 @@ export class UsersController {
     return user;
   }
 
+  @Get('/likedposts')
+  @UseGuards(JwtAuthGuard)
+  @Serialize(LikedPostDto)
+  async getLikedPosts(@CurrentUser() user: User) {
+    return this.usersService.getLikedPosts(user);
+  }
+
   @Get('/:id')
   @UseGuards(JwtAuthGuard)
-  async getUserById(@Param('id') id: string) {
+  @Serialize(UserDto)
+  async getUserById(@Param('id') id: string) : Promise<User> {
     const user = await this.usersService.findById(id);
 
     if (!user) {
@@ -116,4 +130,6 @@ export class UsersController {
 
     return user;
   }
+
+  
 }
