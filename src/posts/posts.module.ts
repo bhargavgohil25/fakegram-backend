@@ -5,11 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Posts } from './posts.entity';
 import { Hashtags } from 'src/hashtags/hashtags.entity';
 import { LikesModule } from '../likes/likes.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Posts, Hashtags]),
-    LikesModule
+    LikesModule,
+    UsersModule
   ],
   controllers: [PostsController],
   providers: [PostsService]

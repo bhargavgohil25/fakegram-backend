@@ -23,15 +23,14 @@ export class UsersService {
     private jwtService: JwtService,
   ) {}
 
-  
-  validate(userName: string) {
+  validate(userName: string): boolean {
     return /^[a-zA-Z0-9_]+$/.test(userName);
   }
   /**
    * @Description Create an Account
    * @Body (CreateUserDto)
    */
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto): Promise<User> {
     const findUser = await this.findByEmail(createUserDto.email);
 
     if (findUser) {
@@ -45,8 +44,10 @@ export class UsersService {
     }
 
     const userName = createUserDto.userName;
-    if(!this.validate(userName)) {
-      throw new BadRequestException('Username should contain only numbers, alphabets and underscore');
+    if (!this.validate(userName)) {
+      throw new BadRequestException(
+        'Username should contain only numbers, alphabets and underscore',
+      );
     }
 
     const user = this.userRepo.create(createUserDto);
@@ -59,7 +60,7 @@ export class UsersService {
    *  @description Create user- user relation
    *  @Param (userId) : To whom we are following
    */
-  public async createUserFollowRelation(follower: User, followeeId: string) {
+  public async createUserFollowRelation(follower: User, followeeId: string) : Promise<User> {
     const followee = await this.findById(followeeId);
 
     if (!followee) {
@@ -82,7 +83,23 @@ export class UsersService {
    * @Description Followers and Followees of a Particular User
    * @Param (UserId) Of whom we want to know the followers and followees
    */
-  public async getUserFollowInfo(userid: string) {
+  public async getUserFollowInfo(userid: string, currentUser: string) : Promise<User[]> {
+    // First check if the current user follows the userid User
+    const ifFollow = await this.userFollowingRepo.findOne({
+      where: {
+        follower: {
+          id: currentUser,
+        },
+        followee: {
+          id: userid,
+        },
+      },
+    });
+
+    if (!ifFollow) {
+      throw new BadRequestException('You are not following this user');
+    }
+
     const info = this.userRepo
       .createQueryBuilder('users')
       .leftJoinAndSelect('users.followers', 'followerstable')
@@ -99,7 +116,10 @@ export class UsersService {
    * @Body (UpdateUserDto)
    * @param (userid)
    */
-  public async updateUserProfile(userid: string, newUserDetail: UpdateUserDto) {
+  public async updateUserProfile(
+    userid: string,
+    newUserDetail: UpdateUserDto,
+  ): Promise<User> {
     const existingUser = await this.findById(userid);
 
     if (!existingUser) {
@@ -160,7 +180,7 @@ export class UsersService {
     });
   }
 
-  async getUserByToken(token: string) {
+  async getUserByToken(token: string): Promise<User> {
     const resToken: string = token.split('Bearer ')[1];
 
     const user = await this.jwtService.verify(resToken);
@@ -171,15 +191,37 @@ export class UsersService {
     return user;
   }
 
-  // Methods : Unusable
-
   async remove(id: string): Promise<void> {
     await this.userRepo.delete(id);
   }
 
   /**
-   *  @Description Validate the database password and provided from user.
-   * @Params password : string, email : string
+   * @description Check if the user is following the userid
+   * @param (userId) : To whom we are following
+   * @param (currentUser) : Who is following
+  */
+  async ifFollow(userId: string, currentUserId: string): Promise<boolean> {
+    const ifFollow = await this.userFollowingRepo.findOne({
+      where: {
+        follower: {
+          id: currentUserId,
+        },
+        followee: {
+          id: userId,
+        },
+      },
+    });
+
+    if (ifFollow) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * @description Validate the database password and provided from user.
+   * @params password : string, email : string
    */
   async validatePassword(password: string, email: string): Promise<boolean> {
     const user = await this.findByEmail(email);
@@ -189,8 +231,8 @@ export class UsersService {
 
   /**
    * @description get all the posts that are liked by the user
-   * @param (userId)
-   * @return (posts)
+   * @param (userId) the current logged in user
+   * @return (posts) 
    * @protected 🔒
    */
   async getLikedPosts(user: User) {

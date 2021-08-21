@@ -8,7 +8,8 @@ import { Posts } from './posts.entity';
 import { Hashtags } from '../hashtags/hashtags.entity';
 // Dto's
 import { CreatePostDto } from './dto/create-post.dto';
-import { Likes } from '../likes/likes.entity';
+import { UsersService } from '../users/users.service';
+import { Point } from 'geojson';
 
 @Injectable()
 export class PostsService {
@@ -17,6 +18,7 @@ export class PostsService {
     private postsRepo: Repository<Posts>,
     @InjectRepository(Hashtags)
     private hashtagRepo: Repository<Hashtags>,
+    private usersService: UsersService,
   ) {}
 
   /**
@@ -38,24 +40,32 @@ export class PostsService {
     // saving all the hashtags in the hashtag table.
     if (hashtags) {
       for (const hashtag of hashtags) {
-        const hashtagEntity : Hashtags = await this.hashtagRepo.findOne({ hashtag });
+        const hashtagEntity: Hashtags = await this.hashtagRepo.findOne({
+          hashtag,
+        });
         // Check if there is any hashtag with the same name
-        let newHashtag : Hashtags;
+        let newHashtag: Hashtags;
         if (!hashtagEntity) {
           newHashtag = await this.hashtagRepo.save({ hashtag });
           hashtagsEntities.push(newHashtag);
-        }else{
+        } else {
           hashtagsEntities.push(hashtagEntity);
         }
       }
     }
 
-    const post = new Posts();
-    // const post = this.postsRepo.create();
+    const pointObject: Point = {
+      type: 'Point',
+      coordinates: [body.longitude, body.latitude],
+    };
+
+    // const post = new Posts();
+    const post = this.postsRepo.create();
     post.author = creator;
     post.caption = body.caption;
     post.images = body.images;
     post.hashtags = hashtagsEntities;
+    post.location = pointObject;
 
     const resPost = await this.postsRepo.save(post);
 
@@ -66,9 +76,17 @@ export class PostsService {
    * @description get all the posts of user
    * @param {userid} userid
    * @returns {Promise<Posts[]> Posts[]
-  */
+   */
 
-  async getPostsByUserId(userid: string) {
+  async getPostsByUserId(userid: string, currentUserId: string) {
+    // Check if he follows that user
+
+    const ifFollow = await this.usersService.ifFollow(userid, currentUserId);
+
+    if (!ifFollow) {
+      throw new BadRequestException('You are not following this user');
+    }
+
     const posts = await this.postsRepo
       .createQueryBuilder('posts')
       .leftJoinAndSelect('posts.author', 'author')
@@ -87,16 +105,15 @@ export class PostsService {
 
   /**
    * @description get a single post by its id
-  */
+   */
 
-  async getPostsById(postid : string) : Promise<Posts> {
+  async getPostsById(postid: string): Promise<Posts> {
     const post = await this.postsRepo.findOne({
-      where : {
-        id : postid
-      }
-    })
+      where: {
+        id: postid,
+      },
+    });
 
     return post;
   }
-
 }

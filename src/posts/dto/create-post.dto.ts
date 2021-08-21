@@ -1,11 +1,10 @@
 import {
   IsString,
-  IsNumber,
-  Min,
-  Max,
   MaxLength,
   IsArray,
   IsNotEmpty,
+  IsLatLong,
+  IsNumber,
 } from 'class-validator';
 
 export class CreatePostDto {
@@ -17,4 +16,10 @@ export class CreatePostDto {
   @IsArray()
   @IsNotEmpty()
   images: Array<string>;
+
+  @IsNumber()
+  longitude ?: number;
+
+  @IsNumber()
+  latitude ?: number;
 }

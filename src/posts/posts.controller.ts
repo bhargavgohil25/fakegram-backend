@@ -46,8 +46,8 @@ export class PostsController {
 
   @Get('/:userid')
   @UseGuards(JwtAuthGuard)
-  async getPostsByUserId(@Param('userid') userid: string): Promise<Posts[]> {
-    return this.postsService.getPostsByUserId(userid);
+  async getPostsByUserId(@Param('userid') userid: string, @CurrentUser() user : User): Promise<Posts[]> {
+    return this.postsService.getPostsByUserId(userid, user.id);
   }
 
   // TODO : delete post

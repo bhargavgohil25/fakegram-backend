@@ -8,9 +8,11 @@ import {
   ManyToMany,
   JoinTable,
   OneToMany,
+  Index,
 } from 'typeorm';
 import { FakeBaseEntity } from '../commons/base.entity';
 import { User } from '../users/users.entity';
+import { Point } from 'geojson';
 
 class Mention {
   id: string;
@@ -54,6 +56,21 @@ export class Posts extends FakeBaseEntity {
 
   @Column('json', { default: [] })
   mentions: Array<Mention>;
+
+  @Column({ type: 'double precision', name: 'd_lat', nullable: true })
+  lat: number;
+
+  @Column({ type: 'double precision', name: 'd_long', nullable: true })
+  long: number;
+
+  @Index({ spatial: true })
+  @Column({
+    type: 'geography',
+    spatialFeatureType: 'Point',
+    srid: 4326,
+    nullable: true,
+  })
+  location: Point;
 
   // TODO : comments database section
 }

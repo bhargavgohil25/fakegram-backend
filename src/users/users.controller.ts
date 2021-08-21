@@ -32,12 +32,12 @@ import { UsersService } from './users.service';
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
-  
+
   /**
    * @Body(CreateUserDto)
    * @Description(signups a new user)
    */
-  
+
   @Post('/signup')
   @Serialize(UserDto)
   create(@Body() createUserDto: CreateUserDto): Promise<User> {
@@ -56,7 +56,7 @@ export class UsersController {
   async followUser(
     @CurrentUser() follower: User,
     @Param('userid') followeeId: string,
-  ) : Promise<User> {
+  ): Promise<User> {
     const followedUser = await this.usersService.createUserFollowRelation(
       follower,
       followeeId,
@@ -66,15 +66,16 @@ export class UsersController {
   }
 
   /**
-   * @Params(userid : string)
-   * @Description(gets all the following Info of a user with id = userid)
-   * @Returns(followingInfo : Array<User>)
+   * @params (userid : string)
+   * @description (gets all the following Info of a user with id = userid)
+   * @returns (followingInfo : Array<User>)
    */
 
   @Get('/:userid/followinfo')
+  @UseGuards(JwtAuthGuard)
   @Serialize(UserDto)
-  async followInfo(@Param('userid') userid: string) {
-    const result = await this.usersService.getUserFollowInfo(userid);
+  async followInfo(@Param('userid') userid: string, @CurrentUser() user: User) {
+    const result = await this.usersService.getUserFollowInfo(userid, user.id);
     return result;
   }
 
@@ -82,7 +83,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Serialize(UserDto)
   async updateUserProfile(
-    @CurrentUser() user : User,
+    @CurrentUser() user: User,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<User> {
     const resUser = this.usersService.updateUserProfile(user.id, updateUserDto);
@@ -101,13 +102,11 @@ export class UsersController {
 
   @Get('/@:userName')
   @Serialize(UserDto)
-  async getUserByUsername(@Param('userName') userName: string) : Promise<User> {
+  async getUserByUsername(@Param('userName') userName: string): Promise<User> {
     const user = await this.usersService.findByName(userName);
-    // console.log(userName);
     if (!user) {
       throw new NotFoundException('User Not Found');
     }
-
     return user;
   }
 
@@ -121,7 +120,7 @@ export class UsersController {
   @Get('/:id')
   @UseGuards(JwtAuthGuard)
   @Serialize(UserDto)
-  async getUserById(@Param('id') id: string) : Promise<User> {
+  async getUserById(@Param('id') id: string): Promise<User> {
     const user = await this.usersService.findById(id);
 
     if (!user) {
@@ -130,6 +129,4 @@ export class UsersController {
 
     return user;
   }
-
-  
 }

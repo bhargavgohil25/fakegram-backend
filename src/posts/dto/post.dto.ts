@@ -1,4 +1,5 @@
 import { Expose, Type } from 'class-transformer';
+import { Point } from 'geojson';
 import { Hashtags } from 'src/hashtags/hashtags.entity';
 import { User } from 'src/users/users.entity';
 
@@ -41,6 +42,9 @@ class hashtagMock {
 
 export class ReturnPostData {
   @Expose()
+  id: string;
+
+  @Expose()
   @Type(() => authorMock)
   author: User;
 
@@ -69,4 +73,7 @@ export class ReturnPostData {
 
   @Expose()
   updatedAt: Date;
+
+  @Expose()
+  location : Point;
 }
