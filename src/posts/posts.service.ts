@@ -46,9 +46,12 @@ export class PostsService {
         // Check if there is any hashtag with the same name
         let newHashtag: Hashtags;
         if (!hashtagEntity) {
+          // If no hashtag with the same name, create a new hashtag
           newHashtag = await this.hashtagRepo.save({ hashtag });
+          // push the new hashtag to the array of hashtagsEntities
           hashtagsEntities.push(newHashtag);
         } else {
+          // just push the existing hashtag to the array of hashtagsEntities
           hashtagsEntities.push(hashtagEntity);
         }
       }

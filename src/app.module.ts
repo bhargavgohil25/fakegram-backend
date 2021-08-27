@@ -15,7 +15,6 @@ import { Hashtags } from './hashtags/hashtags.entity';
 import { LikesModule } from './likes/likes.module';
 import { Likes } from './likes/likes.entity';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -42,16 +41,18 @@ import { Likes } from './likes/likes.entity';
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(CurrentUserMiddleware).forRoutes(
-      '**/current',
-      { path : '/users/@:userName', method: RequestMethod.GET },
-      { path : '/users/:userid/follow', method: RequestMethod.PUT },
-      { path : '/users/:userid/followinfo', method: RequestMethod.GET },
-      { path : '/users/updateprofile', method: RequestMethod.PATCH },
-      { path : '/users/likedposts', method: RequestMethod.GET },
-      { path : '/posts/', method: RequestMethod.POST },
-      { path : '/posts/like', method: RequestMethod.POST },
-      { path : '/posts/:userid/', method: RequestMethod.GET },
-    );
+    consumer
+      .apply(CurrentUserMiddleware)
+      .forRoutes(
+        '**/current',
+        { path: '/users/@:userName', method: RequestMethod.GET },
+        { path: '/users/:userid/follow', method: RequestMethod.PUT },
+        { path: '/users/:userid/followinfo', method: RequestMethod.GET },
+        { path: '/users/updateprofile', method: RequestMethod.PATCH },
+        { path: '/users/likedposts', method: RequestMethod.GET },
+        { path: '/posts/', method: RequestMethod.POST },
+        { path: '/posts/like', method: RequestMethod.POST },
+        { path: '/posts/:userid/', method: RequestMethod.GET },
+      );
   }
 }

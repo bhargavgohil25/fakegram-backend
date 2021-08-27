@@ -3,7 +3,6 @@ import {
   MaxLength,
   IsArray,
   IsNotEmpty,
-  IsLatLong,
   IsNumber,
 } from 'class-validator';
 

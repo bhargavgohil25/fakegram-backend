@@ -180,7 +180,7 @@ export class UsersService {
     });
   }
 
-  async getUserByToken(token: string): Promise<User> {
+  async getUserByToken(token: string){
     const resToken: string = token.split('Bearer ')[1];
 
     const user = await this.jwtService.verify(resToken);
