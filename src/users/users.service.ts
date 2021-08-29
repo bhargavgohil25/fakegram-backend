@@ -12,6 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { UserFollowing } from './users-follow.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { FilesService } from '../files/files.service';
 
 @Injectable()
 export class UsersService {
@@ -21,6 +22,7 @@ export class UsersService {
     @InjectRepository(UserFollowing)
     private userFollowingRepo: Repository<UserFollowing>,
     private jwtService: JwtService,
+    private filesService: FilesService,
   ) {}
 
   validate(userName: string): boolean {
@@ -60,7 +62,10 @@ export class UsersService {
    *  @description Create user- user relation
    *  @Param (userId) : To whom we are following
    */
-  public async createUserFollowRelation(follower: User, followeeId: string) : Promise<User> {
+  public async createUserFollowRelation(
+    follower: User,
+    followeeId: string,
+  ): Promise<User> {
     const followee = await this.findById(followeeId);
 
     if (!followee) {
@@ -83,7 +88,10 @@ export class UsersService {
    * @Description Followers and Followees of a Particular User
    * @Param (UserId) Of whom we want to know the followers and followees
    */
-  public async getUserFollowInfo(userid: string, currentUser: string) : Promise<User[]> {
+  public async getUserFollowInfo(
+    userid: string,
+    currentUser: string,
+  ): Promise<User[]> {
     // First check if the current user follows the userid User
     const ifFollow = await this.userFollowingRepo.findOne({
       where: {
@@ -140,9 +148,11 @@ export class UsersService {
     if (newUserDetail.bio) {
       existingUser.bio = newUserDetail.bio;
     }
-    if (newUserDetail.avatar) {
-      existingUser.avatar = newUserDetail.avatar;
-    }
+
+    // TODO : Updating the profile picture
+    // if (newUserDetail.avatar) {
+    //   existingUser.avatar = newUserDetail.avatar;
+    // }
     if (newUserDetail.password) {
       existingUser.password = newUserDetail.password;
     }
@@ -180,7 +190,7 @@ export class UsersService {
     });
   }
 
-  async getUserByToken(token: string){
+  async getUserByToken(token: string) {
     const resToken: string = token.split('Bearer ')[1];
 
     const user = await this.jwtService.verify(resToken);
@@ -199,7 +209,7 @@ export class UsersService {
    * @description Check if the user is following the userid
    * @param (userId) : To whom we are following
    * @param (currentUser) : Who is following
-  */
+   */
   async ifFollow(userId: string, currentUserId: string): Promise<boolean> {
     const ifFollow = await this.userFollowingRepo.findOne({
       where: {
@@ -232,7 +242,7 @@ export class UsersService {
   /**
    * @description get all the posts that are liked by the user
    * @param (userId) the current logged in user
-   * @return (posts) 
+   * @return (posts)
    * @protected 🔒
    */
   async getLikedPosts(user: User) {
@@ -245,5 +255,61 @@ export class UsersService {
       .getMany();
 
     return posts;
+  }
+
+  /**
+   * @description Add an avatar to the user
+   * @param (userId) the current logged in user
+   * @param (fileName) the name of the file
+   * @param (imageBuffer) a image file
+   */
+  async addAvatar(userId: string, imageBuffer: Buffer, filename: string) {
+    const user = await this.userRepo.findOne(userId);
+    if (!user) {
+      throw new NotFoundException('User Not Found');
+    }
+
+    if (user.avatar) {
+      await this.userRepo.update(userId, {
+        ...user,
+        avatar: null,
+      });
+      await this.filesService.deletePublicFile(user.avatar.id);
+    }
+
+    const avatar = await this.filesService.uploadPublicFile(
+      imageBuffer,
+      filename,
+    );
+
+    await this.userRepo.update(userId, {
+      ...user,
+      avatar,
+    });
+    return avatar;
+  }
+
+  /**
+   * @description delete the avatar of the user
+   * @param (userId) the current logged in user
+  */  
+  async deleteAvatar(userId : string){
+    const user = await this.userRepo.findOne({ id : userId });
+
+    if(!user){
+      throw new NotFoundException('User Not Found');
+    }
+
+    const fileId = user.avatar?.id;
+
+    if(fileId){
+      await this.userRepo.update(userId, {
+        ...user,
+        avatar: null
+      });
+      await this.filesService.deletePublicFile(fileId);
+    }
+
+    return "Deleted";
   }
 }

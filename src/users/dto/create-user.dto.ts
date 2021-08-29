@@ -7,6 +7,7 @@ import {
   IsString,
   Validate,
 } from 'class-validator';
+import { PublicFile } from '../../files/public-file.entity';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -26,7 +27,7 @@ export class CreateUserDto {
   bio: string;
 
   @IsString()
-  avatar: string;
+  avatar: PublicFile;
 
   @IsNumber()
   followerCount: number;

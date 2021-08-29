@@ -10,6 +10,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserFollowSubscriber } from './subscribers/user-follow.subscriber';
+import { FilesModule } from '../files/files.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { UserFollowSubscriber } from './subscribers/user-follow.subscriber';
       }),
       inject: [ConfigService],
     }),
+    FilesModule
   ],
   controllers: [UsersController],
   providers: [UsersService, JwtStrategy],

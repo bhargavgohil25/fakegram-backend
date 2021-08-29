@@ -16,11 +16,15 @@ import { LikesModule } from './likes/likes.module';
 import { Likes } from './likes/likes.entity';
 import { CommentsModule } from './comments/comments.module';
 import { Comments } from './comments/comments.entity';
+import { FilesModule } from './files/files.module';
+import { PublicFile } from './files/public-file.entity';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: '.env',
+      cache: true,
     }),
     TypeOrmModule.forRoot({
       type: process.env.DB_TYPE as any,
@@ -29,7 +33,15 @@ import { Comments } from './comments/comments.entity';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [User, UserFollowing, Posts, Hashtags, Likes, Comments],
+      entities: [
+        User,
+        UserFollowing,
+        Posts,
+        Hashtags,
+        Likes,
+        Comments,
+        PublicFile,
+      ],
       synchronize: true,
     }),
     UsersModule,
@@ -38,6 +50,7 @@ import { Comments } from './comments/comments.entity';
     HashtagsModule,
     LikesModule,
     CommentsModule,
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
@@ -50,6 +63,8 @@ export class AppModule {
         '**/current',
         { path: '/users/@:userName', method: RequestMethod.GET },
         { path: '/users/:userid/follow', method: RequestMethod.PUT },
+        { path: '/users/avatar', method: RequestMethod.POST },
+        { path: '/users/avatar', method: RequestMethod.DELETE },
         { path: '/users/:userid/followinfo', method: RequestMethod.GET },
         { path: '/users/updateprofile', method: RequestMethod.PATCH },
         { path: '/users/likedposts', method: RequestMethod.GET },

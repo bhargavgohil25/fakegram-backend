@@ -1,3 +1,4 @@
+import { Delete, UploadedFile } from '@nestjs/common';
 import {
   Body,
   Controller,
@@ -9,7 +10,9 @@ import {
   NotFoundException,
   Patch,
   Put,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 // Interceptors
 import { Serialize } from '../interceptors/serialize.interceptor';
@@ -28,6 +31,8 @@ import { User } from './users.entity';
 
 // Services
 import { UsersService } from './users.service';
+
+import { Express } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -63,6 +68,26 @@ export class UsersController {
     );
 
     return followedUser;
+  }
+
+  @Post('avatar')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadAvatar(@CurrentUser() user: User, @UploadedFile() file: Express.Multer.File) {
+
+    // check the extension of the file and valid extension can only go further
+    const extension = file.originalname.split('.').slice(-1)[0];
+    if(extension !== 'png' && extension !== 'jpg' && extension !== 'jpeg') {
+      throw new NotFoundException('File extension is not valid');
+    }
+
+    return this.usersService.addAvatar(user.id, file.buffer, file.originalname);
+  }
+
+  @Delete('avatar')
+  @UseGuards(JwtAuthGuard)
+  async deleteAvatar(@CurrentUser() user: User) : Promise<string> {
+    return this.usersService.deleteAvatar(user.id);
   }
 
   /**

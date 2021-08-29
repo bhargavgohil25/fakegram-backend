@@ -1,4 +1,14 @@
-import { BeforeInsert, Entity, Column, OneToMany, AfterLoad, AfterUpdate, BeforeUpdate } from 'typeorm';
+import {
+  BeforeInsert,
+  Entity,
+  Column,
+  OneToMany,
+  AfterLoad,
+  AfterUpdate,
+  BeforeUpdate,
+  JoinColumn,
+  OneToOne,
+} from 'typeorm';
 import { FakeBaseEntity } from '../commons/base.entity';
 
 import * as bcrypt from 'bcryptjs';
@@ -6,6 +16,7 @@ import { UserFollowing } from './users-follow.entity';
 import { Posts } from '../posts/posts.entity';
 import { Likes } from '../likes/likes.entity';
 import { Comments } from '../comments/comments.entity';
+import { PublicFile } from '../files/public-file.entity';
 
 @Entity('users')
 export class User extends FakeBaseEntity {
@@ -21,9 +32,10 @@ export class User extends FakeBaseEntity {
   @Column({ nullable: true, length: 50 })
   bio?: string;
 
-  @Column({ nullable: true, length: 50 })
-  avatar?: string;
-
+  @JoinColumn()
+  @OneToOne(() => PublicFile, { eager: true, nullable: true })
+  avatar ?: PublicFile;
+  
   @Column({ name: 'follower_count', default: 0 })
   followerCount: number;
 
@@ -40,13 +52,13 @@ export class User extends FakeBaseEntity {
   followees: User[];
 
   @OneToMany(() => Posts, (post) => post.author)
-  posts : Posts[];
+  posts: Posts[];
 
   @OneToMany(() => Likes, (like) => like.user)
-  likes : Likes[]
+  likes: Likes[];
 
   @OneToMany(() => Comments, (comment) => comment.user)
-  comments : Comments[];
+  comments: Comments[];
 
   @BeforeInsert()
   @BeforeUpdate()
