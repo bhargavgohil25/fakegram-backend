@@ -5,6 +5,7 @@ import * as bcrypt from 'bcryptjs';
 import { UserFollowing } from './users-follow.entity';
 import { Posts } from '../posts/posts.entity';
 import { Likes } from '../likes/likes.entity';
+import { Comments } from '../comments/comments.entity';
 
 @Entity('users')
 export class User extends FakeBaseEntity {
@@ -43,6 +44,9 @@ export class User extends FakeBaseEntity {
 
   @OneToMany(() => Likes, (like) => like.user)
   likes : Likes[]
+
+  @OneToMany(() => Comments, (comment) => comment.user)
+  comments : Comments[];
 
   @BeforeInsert()
   @BeforeUpdate()

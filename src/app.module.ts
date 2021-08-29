@@ -14,6 +14,8 @@ import { HashtagsModule } from './hashtags/hashtags.module';
 import { Hashtags } from './hashtags/hashtags.entity';
 import { LikesModule } from './likes/likes.module';
 import { Likes } from './likes/likes.entity';
+import { CommentsModule } from './comments/comments.module';
+import { Comments } from './comments/comments.entity';
 
 @Module({
   imports: [
@@ -27,7 +29,7 @@ import { Likes } from './likes/likes.entity';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [User, UserFollowing, Posts, Hashtags, Likes],
+      entities: [User, UserFollowing, Posts, Hashtags, Likes, Comments],
       synchronize: true,
     }),
     UsersModule,
@@ -35,6 +37,7 @@ import { Likes } from './likes/likes.entity';
     PostsModule,
     HashtagsModule,
     LikesModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
@@ -53,6 +56,7 @@ export class AppModule {
         { path: '/posts/', method: RequestMethod.POST },
         { path: '/posts/like', method: RequestMethod.POST },
         { path: '/posts/:userid/', method: RequestMethod.GET },
+        { path: '/comments/:postid/', method: RequestMethod.POST },
       );
   }
 }

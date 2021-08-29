@@ -84,11 +84,13 @@ export class PostsService {
   async getPostsByUserId(userid: string, currentUserId: string) {
     // Check if he follows that user
 
-    const ifFollow = await this.usersService.ifFollow(userid, currentUserId);
-
-    if (!ifFollow) {
-      throw new BadRequestException('You are not following this user');
-    }
+    if(userid !== currentUserId){
+      const ifFollow = await this.usersService.ifFollow(userid, currentUserId);
+  
+      if (!ifFollow) {
+        throw new BadRequestException('You are not following this user');
+      }
+    } 
 
     const posts = await this.postsRepo
       .createQueryBuilder('posts')

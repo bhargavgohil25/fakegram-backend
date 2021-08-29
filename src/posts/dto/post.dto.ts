@@ -1,7 +1,8 @@
 import { Expose, Type } from 'class-transformer';
 import { Point } from 'geojson';
-import { Hashtags } from 'src/hashtags/hashtags.entity';
-import { User } from 'src/users/users.entity';
+import { Comments } from '../../comments/comments.entity';
+import { Hashtags } from '../../hashtags/hashtags.entity';
+import { User } from '../../users/users.entity';
 
 class authorMock {
   @Expose()
@@ -22,14 +23,14 @@ class authorMock {
 
 class authorMock2 {
   @Expose()
-  id : string;
+  id: string;
 
   @Expose()
-  createdAt : Date;
+  createdAt: Date;
 
   @Expose()
   @Type(() => authorMock)
-  user : User;
+  user: User;
 }
 
 class hashtagMock {
@@ -38,6 +39,24 @@ class hashtagMock {
 
   @Expose()
   hashtag: string;
+}
+
+class commentMock {
+  @Expose()
+  id: string;
+
+  @Expose()
+  commentBody: string;
+
+  @Expose()
+  createdAt: Date;
+
+  @Expose()
+  updatedAt: Date;
+
+  @Expose()
+  @Type(() => authorMock)
+  user: User;
 }
 
 export class ReturnPostData {
@@ -75,5 +94,9 @@ export class ReturnPostData {
   updatedAt: Date;
 
   @Expose()
-  location : Point;
+  location: Point;
+
+  @Expose()
+  @Type(() => commentMock)
+  comments: Array<Comments>;
 }

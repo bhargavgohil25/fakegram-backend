@@ -13,6 +13,7 @@ import {
 import { FakeBaseEntity } from '../commons/base.entity';
 import { User } from '../users/users.entity';
 import { Point } from 'geojson';
+import { Comments } from '../comments/comments.entity';
 
 class Mention {
   id: string;
@@ -56,6 +57,9 @@ export class Posts extends FakeBaseEntity {
 
   @Column('json', { default: [] })
   mentions: Array<Mention>;
+
+  @OneToMany(() => Comments, (comment) => comment.post)
+  comments: Comments[];
 
   @Column({ type: 'double precision', name: 'd_lat', nullable: true })
   lat: number;

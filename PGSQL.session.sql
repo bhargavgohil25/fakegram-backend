@@ -1,1 +1,2 @@
-SELECT * from user;
+DELETE FROM comments;
+DELETE FROM comments_closure;
