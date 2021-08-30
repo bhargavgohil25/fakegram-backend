@@ -13,6 +13,7 @@ import * as bcrypt from 'bcryptjs';
 import { UserFollowing } from './users-follow.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { FilesService } from '../files/files.service';
+import { PublicFile } from '../files/public-file.entity';
 
 @Injectable()
 export class UsersService {
@@ -33,13 +34,13 @@ export class UsersService {
    * @Body (CreateUserDto)
    */
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const findUser = await this.findByEmail(createUserDto.email);
+    const findUser : User = await this.findByEmail(createUserDto.email);
 
     if (findUser) {
       throw new BadRequestException('Email already Exist');
     }
 
-    const findUserByName = await this.findByName(createUserDto.userName);
+    const findUserByName : User = await this.findByName(createUserDto.userName);
 
     if (findUserByName) {
       throw new BadRequestException('Username already Exist');
@@ -66,7 +67,7 @@ export class UsersService {
     follower: User,
     followeeId: string,
   ): Promise<User> {
-    const followee = await this.findById(followeeId);
+    const followee : User = await this.findById(followeeId);
 
     if (!followee) {
       throw new NotFoundException('User Not Found');
@@ -277,7 +278,7 @@ export class UsersService {
       await this.filesService.deletePublicFile(user.avatar.id);
     }
 
-    const avatar = await this.filesService.uploadPublicFile(
+    const avatar : PublicFile = await this.filesService.uploadPublicFile(
       imageBuffer,
       filename,
     );
@@ -293,14 +294,14 @@ export class UsersService {
    * @description delete the avatar of the user
    * @param (userId) the current logged in user
   */  
-  async deleteAvatar(userId : string){
-    const user = await this.userRepo.findOne({ id : userId });
+  async deleteAvatar(userId : string) : Promise<string> {
+    const user : User = await this.userRepo.findOne({ id : userId });
 
     if(!user){
       throw new NotFoundException('User Not Found');
     }
 
-    const fileId = user.avatar?.id;
+    const fileId : string = user.avatar?.id;
 
     if(fileId){
       await this.userRepo.update(userId, {
