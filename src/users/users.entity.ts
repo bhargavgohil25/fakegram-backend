@@ -17,6 +17,7 @@ import { Posts } from '../posts/posts.entity';
 import { Likes } from '../likes/likes.entity';
 import { Comments } from '../comments/comments.entity';
 import { PublicFile } from '../files/public-file.entity';
+import { PrivateFile } from 'src/files/private-file.entity';
 
 @Entity('users')
 export class User extends FakeBaseEntity {
@@ -59,6 +60,9 @@ export class User extends FakeBaseEntity {
 
   @OneToMany(() => Comments, (comment) => comment.user)
   comments: Comments[];
+
+  @OneToMany(() => PrivateFile, (file : PrivateFile) => file.user)
+  postimages: Array<PrivateFile>;
 
   @BeforeInsert()
   @BeforeUpdate()

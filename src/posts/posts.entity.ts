@@ -14,6 +14,7 @@ import { FakeBaseEntity } from '../commons/base.entity';
 import { User } from '../users/users.entity';
 import { Point } from 'geojson';
 import { Comments } from '../comments/comments.entity';
+import { PrivateFile } from '../files/private-file.entity';
 
 class Mention {
   id: string;
@@ -25,8 +26,10 @@ export class Posts extends FakeBaseEntity {
   @Column({ length: 200, nullable: true })
   caption: string;
 
-  @Column('text', { array: true, default: [] })
-  images: Array<string>;
+  // @Column('text', { array: true, default: [] })
+  // images: Array<string>;
+  @OneToMany(() => PrivateFile, (file: PrivateFile) => file.post)
+  images: PrivateFile[];
 
   @Column({ name: 'repost_count', default: 0 })
   repostCount: number;

@@ -11,11 +11,6 @@ export class CreatePostDto {
   @MaxLength(100)
   caption: string;
 
-  @IsString({ each : true })
-  @IsArray()
-  @IsNotEmpty()
-  images: Array<string>;
-
   @IsNumber()
   longitude ?: number;
 

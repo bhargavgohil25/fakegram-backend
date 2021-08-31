@@ -10,6 +10,8 @@ import { Hashtags } from '../hashtags/hashtags.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UsersService } from '../users/users.service';
 import { Point } from 'geojson';
+import { FilesService } from '../files/files.service';
+import { PrivateFile } from '../files/private-file.entity';
 
 @Injectable()
 export class PostsService {
@@ -19,6 +21,7 @@ export class PostsService {
     @InjectRepository(Hashtags)
     private hashtagRepo: Repository<Hashtags>,
     private usersService: UsersService,
+    private privateFilesService: FilesService,
   ) {}
 
   /**
@@ -28,7 +31,12 @@ export class PostsService {
    * @returns {Promise<Posts> Post
    */
 
-  async createPost(creator: User, body: CreatePostDto) {
+  async createPost(
+    creator: User,
+    body: CreatePostDto,
+    imageBuffer: Buffer,
+    filename: string,
+  ) {
     if (!body.caption) {
       throw new BadRequestException('Post must contain some text');
     }
@@ -66,13 +74,60 @@ export class PostsService {
     const post = this.postsRepo.create();
     post.author = creator;
     post.caption = body.caption;
-    post.images = body.images;
+    // post.images = body.images;
     post.hashtags = hashtagsEntities;
     post.location = pointObject;
 
     const resPost = await this.postsRepo.save(post);
 
+    // Post image implememntation
+    const newFile = await this.addPrivatePostImages(
+      creator,
+      resPost,
+      imageBuffer,
+      filename,
+    );
+    resPost.images = [newFile];
+
     return resPost;
+  }
+
+  // Helper Method for posting images
+  async addPrivatePostImages(
+    user: User,
+    post: Posts,
+    imageBuffer,
+    filename: string,
+  ): Promise<PrivateFile> {
+    return this.privateFilesService.uploadPrivateFile(
+      imageBuffer,
+      post,
+      user,
+      filename,
+    );
+  }
+
+  /**
+   * @description Get the private file as a stream (not recommended)
+   * @param userid 
+   * @param fileid 
+   * @returns PrivateFile entity of the file
+   */
+  // it can be accessed only by the someone who follows the post author and self also
+  async getPrivateFile(userid: string, fileid: string) {
+    const file = await this.privateFilesService.getPrivateFile(fileid);
+    console.log(file);
+    //check the follow constraint, i.e the file uploaded cn be accessed or not
+    // the author of the post can access those files/images
+    const canFollow : Promise<boolean> = this.usersService.ifFollow(file.info.user.id, userid);
+
+    const samePerson = (userid === file.info.user.id ? true : false);
+
+    if (!canFollow || !samePerson) {
+      throw new BadRequestException("You don't follow author of this post");
+    }
+
+    return file;
   }
 
   /**
@@ -84,13 +139,13 @@ export class PostsService {
   async getPostsByUserId(userid: string, currentUserId: string) {
     // Check if he follows that user
 
-    if(userid !== currentUserId){
+    if (userid !== currentUserId) {
       const ifFollow = await this.usersService.ifFollow(userid, currentUserId);
-  
+
       if (!ifFollow) {
         throw new BadRequestException('You are not following this user');
       }
-    } 
+    }
 
     const posts = await this.postsRepo
       .createQueryBuilder('posts')
