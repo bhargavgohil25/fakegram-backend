@@ -23,7 +23,8 @@ import { LikeDto } from './dto/like.dto';
 import { LikesService } from '../likes/likes.service';
 import { Express } from 'express';
 import { Response } from 'express';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { UploadedFiles } from '@nestjs/common';
 
 @Controller('posts')
 @Serialize(ReturnPostData)
@@ -43,18 +44,13 @@ export class PostsController {
 
   @Post('/')
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FilesInterceptor('files', 3))
   async createNewPost(
     @CurrentUser() user: User,
     @Body() postBodyDto: CreatePostDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles() files: Array<Express.Multer.File>,
   ): Promise<Posts> {
-    return this.postsService.createPost(
-      user,
-      postBodyDto,
-      file.buffer,
-      file.originalname,
-    );
+    return this.postsService.createPost(user, postBodyDto, files);
   }
 
   @Get('/files/:id')

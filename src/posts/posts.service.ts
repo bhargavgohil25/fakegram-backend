@@ -34,8 +34,7 @@ export class PostsService {
   async createPost(
     creator: User,
     body: CreatePostDto,
-    imageBuffer: Buffer,
-    filename: string,
+    files: Array<Express.Multer.File>
   ) {
     if (!body.caption) {
       throw new BadRequestException('Post must contain some text');
@@ -84,10 +83,9 @@ export class PostsService {
     const newFile = await this.addPrivatePostImages(
       creator,
       resPost,
-      imageBuffer,
-      filename,
+      files
     );
-    resPost.images = [newFile];
+    resPost.images = newFile;
 
     return resPost;
   }
@@ -96,14 +94,12 @@ export class PostsService {
   async addPrivatePostImages(
     user: User,
     post: Posts,
-    imageBuffer,
-    filename: string,
-  ): Promise<PrivateFile> {
+    files: Array<Express.Multer.File>
+  ): Promise<PrivateFile[]> {
     return this.privateFilesService.uploadPrivateFile(
-      imageBuffer,
       post,
       user,
-      filename,
+      files
     );
   }
 

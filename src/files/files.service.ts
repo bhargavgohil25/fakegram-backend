@@ -67,36 +67,45 @@ export class FilesService {
   }
 
   /**
-   * @description uploads a private image to s3 bucket
-   * @returns file with PrivateFile interface i.e key, user, post entity
-   * @todo upload multiple images
+   * @description uploads a multiple images to s3 bucket
+   * @param files
+   * @returns files with PrivateFile interface i.e key, user, post entity
    */
 
   async uploadPrivateFile(
-    databuffer: Buffer,
     post: Posts,
     user: User,
-    filename: string,
+    files: Array<Express.Multer.File>
   ) {
     const s3 = new S3();
-    const uploadResult = await s3
-      .upload({
-        ACL: 'private',
+    const filePromises = [];
+    for(let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const fileKey = `${uuid()}-${file.originalname}`;
+      const uploadParams = {
         Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
-        Body: databuffer,
-        Key: `${uuid()}-${filename}`,
-      })
-      .promise();
+        Key: fileKey,
+        Body: file.buffer,
+        ACL: 'private',
+      };
+      const data = await s3.upload(uploadParams).promise();
 
-    const newFile = this.privateFilesRepository.create({
-      key: uploadResult.Key,
-      user: user,
-      post: post,
-    });
+      filePromises.push(data);
+    }
 
-    await this.privateFilesRepository.save(newFile);
+    const promiseDone = await Promise.all(filePromises);
 
-    return newFile;
+    const newFiles = promiseDone.map(async data => {
+      const unsave = this.privateFilesRepository.create({
+        key: data.Key,
+        user: user,
+        post: post,
+      });
+
+      return await this.privateFilesRepository.save(unsave);
+    })
+
+    return Promise.all(newFiles);
   }
 
   /**
