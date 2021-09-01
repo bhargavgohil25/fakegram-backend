@@ -26,7 +26,7 @@ import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('posts')
-// @Serialize(ReturnPostData)
+@Serialize(ReturnPostData)
 export class PostsController {
   constructor(
     private readonly postsService: PostsService,

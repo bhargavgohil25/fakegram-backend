@@ -1,13 +1,16 @@
 import { Expose, Type } from 'class-transformer';
 import { Point } from 'geojson';
+import { PrivateFile } from '../../files/private-file.entity';
 import { Comments } from '../../comments/comments.entity';
 import { Hashtags } from '../../hashtags/hashtags.entity';
 import { User } from '../../users/users.entity';
 
-class authorMock {
+abstract class baseDto{
   @Expose()
   id: string;
+}
 
+class authorMock extends baseDto {
   @Expose()
   userName: string;
 
@@ -21,10 +24,7 @@ class authorMock {
   verified: boolean;
 }
 
-class authorMock2 {
-  @Expose()
-  id: string;
-
+class authorMock2 extends baseDto{
   @Expose()
   createdAt: Date;
 
@@ -33,17 +33,12 @@ class authorMock2 {
   user: User;
 }
 
-class hashtagMock {
-  @Expose()
-  id: string;
-
+class hashtagMock extends baseDto {
   @Expose()
   hashtag: string;
 }
 
-class commentMock {
-  @Expose()
-  id: string;
+class commentMock extends baseDto {
 
   @Expose()
   commentBody: string;
@@ -59,10 +54,15 @@ class commentMock {
   user: User;
 }
 
-export class ReturnPostData {
+class ImageDto extends baseDto {
   @Expose()
-  id: string;
+  key: string;
 
+  @Expose()
+  url: string;
+}
+
+export class ReturnPostData extends baseDto {
   @Expose()
   @Type(() => authorMock)
   author: User;
@@ -74,10 +74,8 @@ export class ReturnPostData {
   mentions ?: Array<string>;
 
   @Expose()
-  images: Array<string>;
-
-  @Expose()
-  likesCount: number;
+  @Type(() => ImageDto)
+  images: Array<PrivateFile>;
 
   @Expose()
   @Type(() => hashtagMock)

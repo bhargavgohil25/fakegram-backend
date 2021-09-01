@@ -133,23 +133,19 @@ export class PostsService {
     return file;
   }
 
+  /**
+   * @description Get private images of a post
+   * @param postid
+   * @returns Array of PrivateFile entities
+   * @throws NotAcceptableException
+   */
+
   async getPrivateFileUrl(postid: string, userid: string) {
     const postImages = await this.postsRepo.findOne(
       { id: postid },
       { relations: ['images'] },
     );
 
-    // // check for follow constraint
-    // const canFollow: Promise<boolean> = this.usersService.ifFollow(
-    //   postImages.author.id,
-    //   userid,
-    // );
-
-    // const samePerson = userid === postImages.author.id ? true : false;
-
-    // if (!canFollow || !samePerson) {
-    //   throw new BadRequestException("You don't follow author of this post");
-    // }
     if (postImages) {
       return Promise.all(
         postImages.images.map(async (image) => {
@@ -207,7 +203,7 @@ export class PostsService {
       };
     });
     const res = Promise.all(newPosts);
-    
+
     return res;
   }
 
