@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotAcceptableException } from '@nestjs/common';
 import { User } from '../users/users.entity';
 import { Repository } from 'typeorm';
 import { BadRequestException } from '@nestjs/common';
@@ -109,25 +109,62 @@ export class PostsService {
 
   /**
    * @description Get the private file as a stream (not recommended)
-   * @param userid 
-   * @param fileid 
+   * @param userid
+   * @param fileid
    * @returns PrivateFile entity of the file
    */
   // it can be accessed only by the someone who follows the post author and self also
   async getPrivateFile(userid: string, fileid: string) {
     const file = await this.privateFilesService.getPrivateFile(fileid);
-    console.log(file);
+    // console.log(file);
     //check the follow constraint, i.e the file uploaded cn be accessed or not
     // the author of the post can access those files/images
-    const canFollow : Promise<boolean> = this.usersService.ifFollow(file.info.user.id, userid);
+    const canFollow: Promise<boolean> = this.usersService.ifFollow(
+      file.info.user.id,
+      userid,
+    );
 
-    const samePerson = (userid === file.info.user.id ? true : false);
+    const samePerson = userid === file.info.user.id ? true : false;
 
     if (!canFollow || !samePerson) {
       throw new BadRequestException("You don't follow author of this post");
     }
 
     return file;
+  }
+
+  async getPrivateFileUrl(postid: string, userid: string) {
+    const postImages = await this.postsRepo.findOne(
+      { id: postid },
+      { relations: ['images'] },
+    );
+
+    // // check for follow constraint
+    // const canFollow: Promise<boolean> = this.usersService.ifFollow(
+    //   postImages.author.id,
+    //   userid,
+    // );
+
+    // const samePerson = userid === postImages.author.id ? true : false;
+
+    // if (!canFollow || !samePerson) {
+    //   throw new BadRequestException("You don't follow author of this post");
+    // }
+    if (postImages) {
+      return Promise.all(
+        postImages.images.map(async (image) => {
+          const url = await this.privateFilesService.generatePresignedUrl(
+            image.key,
+          );
+          // console.log(url);
+          return {
+            ...image,
+            url,
+          };
+        }),
+      );
+    }
+    throw new NotAcceptableException('Post with this id not found');
   }
 
   /**
@@ -137,14 +174,15 @@ export class PostsService {
    */
 
   async getPostsByUserId(userid: string, currentUserId: string) {
-    // Check if he follows that user
+    const canFollow: Promise<boolean> = this.usersService.ifFollow(
+      userid,
+      currentUserId,
+    );
 
-    if (userid !== currentUserId) {
-      const ifFollow = await this.usersService.ifFollow(userid, currentUserId);
+    const samePerson = userid === currentUserId ? true : false;
 
-      if (!ifFollow) {
-        throw new BadRequestException('You are not following this user');
-      }
+    if (!canFollow || !samePerson) {
+      throw new BadRequestException("You don't follow author of this post");
     }
 
     const posts = await this.postsRepo
@@ -154,13 +192,23 @@ export class PostsService {
       .leftJoinAndSelect('posts.likes', 'likes')
       .leftJoinAndSelect('likes.user', 'users')
       .addSelect('hashtag.hashtag')
-      .where('posts.author = :userid', { userid });
-
-    return posts
+      .where('posts.author = :userid', { userid })
       .addSelect('posts.created_at')
       .orderBy('posts.created_at', 'DESC')
       .limit(100)
       .getMany();
+
+    // This will be used to get the images of the post (for both single and multiple images)
+    const newPosts = posts.map(async (post) => {
+      const images = await this.getPrivateFileUrl(post.id, currentUserId);
+      post.images = images;
+      return {
+        ...post,
+      };
+    });
+    const res = Promise.all(newPosts);
+    
+    return res;
   }
 
   /**

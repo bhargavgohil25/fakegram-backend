@@ -71,7 +71,7 @@ export class ReturnPostData {
   caption: string;
 
   @Expose()
-  mentions: Array<string>;
+  mentions ?: Array<string>;
 
   @Expose()
   images: Array<string>;

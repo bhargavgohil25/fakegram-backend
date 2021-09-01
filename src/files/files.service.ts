@@ -70,7 +70,7 @@ export class FilesService {
    * @description uploads a private image to s3 bucket
    * @returns file with PrivateFile interface i.e key, user, post entity
    * @todo upload multiple images
-  */
+   */
 
   async uploadPrivateFile(
     databuffer: Buffer,
@@ -101,11 +101,11 @@ export class FilesService {
 
   /**
    * @description get the image file from its fileId, which is passed during upload to private File Repository
-   * @param fileId 
+   * @param fileId
    * @returns stream and fileInfo (i.e URL for the image)
    * @todo get multiple images of a particular post with post id.
    */
-  
+
   async getPrivateFile(fileId: string) {
     const s3 = new S3();
     const fileInfo = await this.privateFilesRepository.findOne(
@@ -126,5 +126,14 @@ export class FilesService {
       };
     }
     throw new NotFoundException();
+  }
+
+  async generatePresignedUrl(key: string) {
+    const s3 = new S3();
+
+    return s3.getSignedUrlPromise('getObject', {
+      Bucket: this.configService.get('AWS_PRIVATE_BUCKET_NAME'),
+      Key: key,
+    });
   }
 }

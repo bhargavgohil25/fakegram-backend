@@ -26,8 +26,6 @@ export class Posts extends FakeBaseEntity {
   @Column({ length: 200, nullable: true })
   caption: string;
 
-  // @Column('text', { array: true, default: [] })
-  // images: Array<string>;
   @OneToMany(() => PrivateFile, (file: PrivateFile) => file.post)
   images: PrivateFile[];
 
@@ -58,8 +56,8 @@ export class Posts extends FakeBaseEntity {
   @JoinColumn({ name: 'author_id' })
   author: User;
 
-  @Column('json', { default: [] })
-  mentions: Array<Mention>;
+  // @Column('json', { default: [] })
+  // mentions ?: Array<Mention>;
 
   @OneToMany(() => Comments, (comment) => comment.post)
   comments: Comments[];
