@@ -78,7 +78,7 @@ export class FilesService {
     files: Array<Express.Multer.File>
   ) {
     const s3 = new S3();
-    const filePromises = [];
+    const filePromises : Array<S3.ManagedUpload.SendData> = [];
     for(let i = 0; i < files.length; i++) {
       const file = files[i];
       const fileKey = `${uuid()}-${file.originalname}`;
@@ -88,7 +88,7 @@ export class FilesService {
         Body: file.buffer,
         ACL: 'private',
       };
-      const data = await s3.upload(uploadParams).promise();
+      const data : S3.ManagedUpload.SendData = await s3.upload(uploadParams).promise();
 
       filePromises.push(data);
     }

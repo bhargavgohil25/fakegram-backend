@@ -50,7 +50,17 @@ export class PostsController {
     @Body() postBodyDto: CreatePostDto,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ): Promise<Posts> {
-    return this.postsService.createPost(user, postBodyDto, files);
+    const validFiles : Array<Express.Multer.File> = [];
+    for (const file of files) {
+      if (
+        file.originalname.endsWith('.jpg') ||
+        file.originalname.endsWith('.jpeg') ||
+        file.originalname.endsWith('.png')
+      ) {
+        validFiles.push(file);
+      }
+    }
+    return this.postsService.createPost(user, postBodyDto, validFiles);
   }
 
   @Get('/files/:id')
