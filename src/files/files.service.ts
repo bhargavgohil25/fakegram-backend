@@ -72,11 +72,11 @@ export class FilesService {
    * @returns files with PrivateFile interface i.e key, user, post entity
    */
 
-  async uploadPrivateFile(
+  async uploadPrivateFiles(
     post: Posts,
     user: User,
     files: Array<Express.Multer.File>
-  ) {
+  ) : Promise<PrivateFile[]> {
     const s3 = new S3();
     const filePromises : Array<S3.ManagedUpload.SendData> = [];
     for(let i = 0; i < files.length; i++) {
@@ -115,7 +115,7 @@ export class FilesService {
    * @todo get multiple images of a particular post with post id.
    */
 
-  async getPrivateFile(fileId: string) {
+  async getPrivateFiles(fileId: string) {
     const s3 = new S3();
     const fileInfo = await this.privateFilesRepository.findOne(
       { id: fileId },

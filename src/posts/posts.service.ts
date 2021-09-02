@@ -96,7 +96,7 @@ export class PostsService {
     post: Posts,
     files: Array<Express.Multer.File>
   ): Promise<PrivateFile[]> {
-    return this.privateFilesService.uploadPrivateFile(
+    return this.privateFilesService.uploadPrivateFiles(
       post,
       user,
       files
@@ -111,18 +111,23 @@ export class PostsService {
    */
   // it can be accessed only by the someone who follows the post author and self also
   async getPrivateFile(userid: string, fileid: string) {
-    const file = await this.privateFilesService.getPrivateFile(fileid);
+    const file = await this.privateFilesService.getPrivateFiles(fileid);
     // console.log(file);
     //check the follow constraint, i.e the file uploaded cn be accessed or not
     // the author of the post can access those files/images
-    const canFollow: Promise<boolean> = this.usersService.ifFollow(
+
+    let canFollow: Promise<boolean> = this.usersService.ifFollow(
       file.info.user.id,
       userid,
     );
 
     const samePerson = userid === file.info.user.id ? true : false;
 
-    if (!canFollow || !samePerson) {
+    if(samePerson){
+      canFollow = Promise.resolve(true);
+    }
+
+    if (!canFollow) {
       throw new BadRequestException("You don't follow author of this post");
     }
 
@@ -166,14 +171,18 @@ export class PostsService {
    */
 
   async getPostsByUserId(userid: string, currentUserId: string) {
-    const canFollow: Promise<boolean> = this.usersService.ifFollow(
+    let canFollow: Promise<boolean> = this.usersService.ifFollow(
       userid,
       currentUserId,
     );
 
     const samePerson = userid === currentUserId ? true : false;
 
-    if (!canFollow || !samePerson) {
+    if(samePerson){
+      canFollow = Promise.resolve(true);
+    }
+
+    if (!canFollow) {
       throw new BadRequestException("You don't follow author of this post");
     }
 
