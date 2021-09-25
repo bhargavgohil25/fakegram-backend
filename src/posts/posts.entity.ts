@@ -26,7 +26,7 @@ export class Posts extends FakeBaseEntity {
   @Column({ length: 200, nullable: true })
   caption: string;
 
-  @OneToMany(() => PrivateFile, (file: PrivateFile) => file.post)
+  @OneToMany(() => PrivateFile, (file: PrivateFile) => file.post, { cascade: true })
   images: PrivateFile[];
 
   @Column({ name: 'repost_count', default: 0 })
@@ -52,7 +52,7 @@ export class Posts extends FakeBaseEntity {
   @OneToMany(() => Likes, (like) => like.post)
   likes: Likes[];
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'author_id' })
   author: User;
 

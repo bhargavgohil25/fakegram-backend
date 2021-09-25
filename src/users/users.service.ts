@@ -34,13 +34,13 @@ export class UsersService {
    * @Body (CreateUserDto)
    */
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const findUser : User = await this.findByEmail(createUserDto.email);
+    const findUser: User = await this.findByEmail(createUserDto.email);
 
     if (findUser) {
       throw new BadRequestException('Email already Exist');
     }
 
-    const findUserByName : User = await this.findByName(createUserDto.userName);
+    const findUserByName: User = await this.findByName(createUserDto.userName);
 
     if (findUserByName) {
       throw new BadRequestException('Username already Exist');
@@ -67,7 +67,7 @@ export class UsersService {
     follower: User,
     followeeId: string,
   ): Promise<User> {
-    const followee : User = await this.findById(followeeId);
+    const followee: User = await this.findById(followeeId);
 
     if (!followee) {
       throw new NotFoundException('User Not Found');
@@ -278,7 +278,7 @@ export class UsersService {
       await this.filesService.deletePublicFile(user.avatar.id);
     }
 
-    const avatar : PublicFile = await this.filesService.uploadPublicFile(
+    const avatar: PublicFile = await this.filesService.uploadPublicFile(
       imageBuffer,
       filename,
     );
@@ -293,24 +293,42 @@ export class UsersService {
   /**
    * @description delete the avatar of the user
    * @param (userId) the current logged in user
-  */  
-  async deleteAvatar(userId : string) : Promise<string> {
-    const user : User = await this.userRepo.findOne({ id : userId });
+   */
+  async deleteAvatar(userId: string): Promise<string> {
+    const user: User = await this.userRepo.findOne({ id: userId });
 
-    if(!user){
+    if (!user) {
       throw new NotFoundException('User Not Found');
     }
 
-    const fileId : string = user.avatar?.id;
+    const fileId: string = user.avatar?.id;
 
-    if(fileId){
+    if (fileId) {
       await this.userRepo.update(userId, {
         ...user,
-        avatar: null
+        avatar: null,
       });
       await this.filesService.deletePublicFile(fileId);
     }
 
-    return "Deleted";
+    return 'Deleted';
+  }
+
+  /**
+   * @description storing 2fa secret in the database
+   */
+  async setTwoFactorAuthenticationSecret(secret: string, userId: string) {
+    return this.userRepo.update(userId, {
+      twoFactorAuthenticationSecret: secret,
+    });
+  }
+
+  /**
+   * @description turns on the 2fa 
+   */
+  async turnOnTwoFactorAuthentication(userId: string) {
+    return this.userRepo.update(userId, {
+      isTwoFactorAuhenticationEnabled: true,
+    });
   }
 }

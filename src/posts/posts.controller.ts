@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -27,7 +28,8 @@ import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { UploadedFiles } from '@nestjs/common';
 
 @Controller('posts')
-@Serialize(ReturnPostData)
+@UseGuards(JwtAuthGuard)
+// @Serialize(ReturnPostData)
 export class PostsController {
   constructor(
     private readonly postsService: PostsService,
@@ -35,7 +37,6 @@ export class PostsController {
   ) {}
 
   @Get('/current')
-  @UseGuards(JwtAuthGuard)
   async getCurrentUserId(@CurrentUser() user: User) {
     // console.log('running endpoint');
     // console.log(user)
@@ -43,13 +44,17 @@ export class PostsController {
   }
 
   @Post('/')
-  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FilesInterceptor('files', 3))
   async createNewPost(
     @CurrentUser() user: User,
     @Body() postBodyDto: CreatePostDto,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ): Promise<Posts> {
+
+    if(!files || files.length === 0) {
+      throw new BadRequestException('Cannot upload only Text');
+    }
+
     const validFiles : Array<Express.Multer.File> = [];
     for (const file of files) {
       if (
@@ -64,7 +69,6 @@ export class PostsController {
   }
 
   @Get('/files/:id')
-  @UseGuards(JwtAuthGuard)
   async getPrivateFile(
     @CurrentUser() user: User,
     @Param('id') id: string,
@@ -75,7 +79,6 @@ export class PostsController {
   }
 
   @Get('/:userid')
-  @UseGuards(JwtAuthGuard)
   async getPostsByUserId(
     @Param('userid') userid: string,
     @CurrentUser() user: User,
@@ -85,13 +88,11 @@ export class PostsController {
 
   // TODO : delete post
   @Delete('/:postid')
-  @UseGuards(JwtAuthGuard)
   async deletePost(@Param('postid') postid: string): Promise<void> {
     // return this.postsService.deletePost(postid);
   }
 
   @Post('/like')
-  @UseGuards(JwtAuthGuard)
   async likePost(
     @Body() likeDto: LikeDto,
     @CurrentUser() user: User,

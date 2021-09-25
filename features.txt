@@ -18,4 +18,6 @@ Pending :
 4) Add a feature to get all the posts from certain location.
 5) User can able to save Post, and retrieve it later.
 6) Mentioning people in the post.
+7) Add a 2F2 authentication for the user.
+8) Add a in-memory cache.
 

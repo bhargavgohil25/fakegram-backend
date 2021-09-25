@@ -7,6 +7,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from '../strategies/jwt.strategy';
 import { AuthMiddleware } from './middlewares/auth.middleware';
+import { TwoFactorAuthenticationService } from './two-factor-authentication.service';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { AuthMiddleware } from './middlewares/auth.middleware';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, TwoFactorAuthenticationService],
   exports : [AuthService]
 })
 export class AuthModule {

@@ -8,6 +8,7 @@ import {
   BeforeUpdate,
   JoinColumn,
   OneToOne,
+  Index,
 } from 'typeorm';
 import { FakeBaseEntity } from '../commons/base.entity';
 
@@ -21,6 +22,7 @@ import { PrivateFile } from 'src/files/private-file.entity';
 
 @Entity('users')
 export class User extends FakeBaseEntity {
+  @Index('user_name_index')
   @Column({ nullable: false, length: 50, unique: true })
   userName: string;
 
@@ -35,8 +37,8 @@ export class User extends FakeBaseEntity {
 
   @JoinColumn()
   @OneToOne(() => PublicFile, { eager: true, nullable: true })
-  avatar ?: PublicFile;
-  
+  avatar?: PublicFile;
+
   @Column({ name: 'follower_count', default: 0 })
   followerCount: number;
 
@@ -52,17 +54,25 @@ export class User extends FakeBaseEntity {
   @OneToMany(() => UserFollowing, (userFollowing) => userFollowing.follower)
   followees: User[];
 
-  @OneToMany(() => Posts, (post) => post.author)
+  @OneToMany(() => Posts, (post) => post.author, { cascade: true })
   posts: Posts[];
 
   @OneToMany(() => Likes, (like) => like.user)
   likes: Likes[];
 
-  @OneToMany(() => Comments, (comment) => comment.user)
+  @OneToMany(() => Comments, (comment) => comment.user, { cascade: true })
   comments: Comments[];
 
-  @OneToMany(() => PrivateFile, (file : PrivateFile) => file.user)
+  @OneToMany(() => PrivateFile, (file: PrivateFile) => file.user, {
+    cascade: true,
+  })
   postimages: Array<PrivateFile>;
+
+  @Column({ nullable: true })
+  public twoFactorAuthenticationSecret?: string;
+
+  @Column({ default: false })
+  public isTwoFactorAuhenticationEnabled: boolean;
 
   @BeforeInsert()
   @BeforeUpdate()

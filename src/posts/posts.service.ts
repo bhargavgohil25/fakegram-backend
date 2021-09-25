@@ -107,7 +107,7 @@ export class PostsService {
    * @description Get the private file as a stream (not recommended)
    * @param userid
    * @param fileid
-   * @returns PrivateFile entity of the file
+   * @returns PrivateFile entity of the file 
    */
   // it can be accessed only by the someone who follows the post author and self also
   async getPrivateFile(userid: string, fileid: string) {
@@ -190,6 +190,8 @@ export class PostsService {
       .createQueryBuilder('posts')
       .leftJoinAndSelect('posts.author', 'author')
       .leftJoinAndSelect('posts.hashtags', 'hashtag')
+      .leftJoinAndSelect('posts.comments', 'comments')
+      .leftJoinAndSelect('comments.replies', 'replies')
       .leftJoinAndSelect('posts.likes', 'likes')
       .leftJoinAndSelect('likes.user', 'users')
       .addSelect('hashtag.hashtag')

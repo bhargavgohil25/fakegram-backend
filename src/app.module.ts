@@ -25,6 +25,7 @@ import { Comments } from './comments/comments.entity';
 import { FilesModule } from './files/files.module';
 import { PublicFile } from './files/public-file.entity';
 import { PrivateFile } from './files/private-file.entity';
+import { Replies } from './comments/replies.entity';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { PrivateFile } from './files/private-file.entity';
         Comments,
         PublicFile,
         PrivateFile,
+        Replies,
       ],
       synchronize: true,
     }),
@@ -72,6 +74,8 @@ export class AppModule {
         { path: '/users/@:userName', method: RequestMethod.GET },
         { path: '/users/:userid/follow', method: RequestMethod.PUT },
         { path: '/users/avatar', method: RequestMethod.POST },
+        { path: '/users/2fa/generate', method: RequestMethod.POST },
+        { path: '/users/2fa/turn-on', method: RequestMethod.POST },
         { path: '/users/avatar', method: RequestMethod.DELETE },
         { path: '/users/:userid/followinfo', method: RequestMethod.GET },
         { path: '/users/updateprofile', method: RequestMethod.PATCH },
