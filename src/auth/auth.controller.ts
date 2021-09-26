@@ -78,6 +78,12 @@ export class AuthController {
     if (!isCodeValid) {
       throw new UnauthorizedException('Authentication Code Invalid');
     }
+
+    const cookieAccessToken = this.authService.getCookieWithJwtAccessToken(user.id, true);
     
+    // attaching the token to the request handler instead of returning 
+    // returning a user...
+    
+    return cookieAccessToken;
   }
 }
