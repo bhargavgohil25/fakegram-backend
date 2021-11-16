@@ -59,6 +59,7 @@ export class UsersService {
     return newUser;
   }
 
+  //! TODO: Toggle the follow method
   /**
    *  @description Create user- user relation
    *  @Param (userId) : To whom we are following
@@ -66,7 +67,7 @@ export class UsersService {
   public async createUserFollowRelation(
     follower: User,
     followeeId: string,
-  ): Promise<User> {
+  ): Promise<User | { message: string }> {
     const followee: User = await this.findById(followeeId);
 
     if (!followee) {
@@ -75,6 +76,21 @@ export class UsersService {
 
     if (followee.id === follower.id) {
       throw new BadRequestException('You cannot follow yourself');
+    }
+
+    // check if the user is already following the user
+    const check = await this.ifFollow(followee.id, follower.id);
+    // console.log(check);
+    if (check) {
+      // remve the follow relation
+      await this.userFollowingRepo.delete({
+        follower: follower,
+        followee: followee,
+      });
+
+      return {
+        message: 'You unfollowed the user'
+      }
     }
 
     const newFollowee = await this.userFollowingRepo.save({
