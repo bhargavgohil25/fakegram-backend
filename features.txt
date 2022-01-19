@@ -20,4 +20,7 @@ Pending :
 6) Mentioning people in the post.
 7) Add a 2F2 authentication for the user.
 8) Add a in-memory cache.
+9) send a notification to the user when someone follows him
+  - send notification when someone comments on his post
+  - able to turn on/off notifications
 

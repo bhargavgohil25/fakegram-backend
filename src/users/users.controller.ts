@@ -45,14 +45,14 @@ export class UsersController {
 
   @Post('/signup')
   @Serialize(UserDto)
-  create(@Body() createUserDto: CreateUserDto): Promise<User> {
+  async create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.usersService.create(createUserDto);
   }
 
   /**
-   * @Params(userid : string)
-   * @Description(followers a user with id = userid)
-   * @Returns(followedUser : User)
+   * @params (userid : string)
+   * @description (follows a user with id = userid)
+   * @returns (followedUser : User)
    */
 
   @Put('/:userid/follow')

@@ -4,7 +4,7 @@ import { UsersController } from './users.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users.entity';
 import { UserFollowing } from './users-follow.entity';
-import { CurrentUserMiddleware } from './middlewares/current-user.middleware';
+import { CurrentUserMiddleware } from '../middleware/current-user.middleware';
 import { JwtStrategy } from '../strategies/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';

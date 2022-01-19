@@ -4,7 +4,7 @@ interface IRoute {
   
 }
 
-export const allRoutes= {
+export const allRoutes = {
 
   first : { path: '/users/@:userName', method: RequestMethod.GET },
   // { path: '/users/:userid/follow', method: RequestMethod.PUT },

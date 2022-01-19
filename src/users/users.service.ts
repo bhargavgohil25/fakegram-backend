@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
   UnauthorizedException,
+  Logger
 } from '@nestjs/common';
 import { User } from './users.entity';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -17,6 +18,8 @@ import { PublicFile } from '../files/public-file.entity';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
+
   constructor(
     @InjectRepository(User)
     private userRepo: Repository<User>,
@@ -37,12 +40,14 @@ export class UsersService {
     const findUser: User = await this.findByEmail(createUserDto.email);
 
     if (findUser) {
+      this.logger.error(`User with email ${createUserDto.email} already exists`);
       throw new BadRequestException('Email already Exist');
     }
 
     const findUserByName: User = await this.findByName(createUserDto.userName);
 
     if (findUserByName) {
+      this.logger.error(`User with username ${createUserDto.userName} already exists`);
       throw new BadRequestException('Username already Exist');
     }
 
@@ -59,9 +64,8 @@ export class UsersService {
     return newUser;
   }
 
-  //! TODO: Toggle the follow method
   /**
-   *  @description Create user- user relation
+   *  @description Create user- user follow relation
    *  @Param (userId) : To whom we are following
    */
   public async createUserFollowRelation(

@@ -169,7 +169,7 @@ export class PostsService {
    * @param {userid} userid
    * @returns {Promise<Posts[]> Posts[]
    */
-
+  
   async getPostsByUserId(userid: string, currentUserId: string) {
     let canFollow: Promise<boolean> = this.usersService.ifFollow(
       userid,
