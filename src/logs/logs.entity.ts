@@ -5,8 +5,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity()
-class Log {
+@Entity('logs')
+export class Log {
   @PrimaryGeneratedColumn('uuid')
   public id: string;
 
@@ -22,5 +22,3 @@ class Log {
   @CreateDateColumn({ name: 'created_at' })
   creationDate: Date;
 }
-
-export default Log;

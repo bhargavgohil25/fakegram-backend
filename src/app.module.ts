@@ -18,7 +18,10 @@ import { LikesModule } from './likes/likes.module';
 import { CommentsModule } from './comments/comments.module';
 // Files Module and Entities
 import { FilesModule } from './files/files.module';
+// database logger modules and entities
 import DatabaseLogger from './database/databaseLogger';
+import { LoggerModule } from './logs/logger.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -42,6 +45,7 @@ import DatabaseLogger from './database/databaseLogger';
         synchronize: true,
       }),
     }),
+    ScheduleModule.forRoot(),
     UsersModule,
     AuthModule,
     PostsModule,
@@ -49,6 +53,7 @@ import DatabaseLogger from './database/databaseLogger';
     LikesModule,
     CommentsModule,
     FilesModule,
+    LoggerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

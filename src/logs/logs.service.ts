@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import Log from './logs.entity';
+import { Log } from './logs.entity';
 import CreateLogDto from './dto/createLog.dto';
 
 @Injectable()
@@ -11,6 +11,11 @@ export default class LogsService {
     private readonly logsRepository: Repository<Log>,
   ) {}
 
+  /**
+   * create a query log in database
+   * @param createLogDto log
+   * @returns log
+   */
   async createLog(log: CreateLogDto): Promise<Log> {
     const newLog = await this.logsRepository.create(log);
 
