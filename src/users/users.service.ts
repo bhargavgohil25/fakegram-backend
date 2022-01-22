@@ -290,6 +290,7 @@ export class UsersService {
       throw new NotFoundException('User Not Found');
     }
 
+    // If the avatar is already there, delete it
     if (user.avatar) {
       await this.userRepo.update(userId, {
         ...user,

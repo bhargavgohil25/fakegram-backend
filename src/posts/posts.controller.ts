@@ -22,14 +22,13 @@ import { ReturnPostData } from './dto/post.dto';
 import { Posts } from './posts.entity';
 import { LikeDto } from './dto/like.dto';
 import { LikesService } from '../likes/likes.service';
-import { Express } from 'express';
 import { Response } from 'express';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { UploadedFiles } from '@nestjs/common';
 
 @Controller('posts')
 @UseGuards(JwtAuthGuard)
-// @Serialize(ReturnPostData)
+@Serialize(ReturnPostData)
 export class PostsController {
   constructor(
     private readonly postsService: PostsService,
@@ -96,12 +95,16 @@ export class PostsController {
   async likePost(
     @Body() likeDto: LikeDto,
     @CurrentUser() user: User,
-  ): Promise<string> {
+  ){
     const post = await this.postsService.getPostsById(likeDto.postId);
 
     if (!post) {
       throw new NotFoundException('Post was not foound');
     }
-    return this.likesService.likeUnlike(post, user);
+    const response = this.likesService.likeUnlike(post, user);
+
+    return {
+      message: response,
+    }
   }
 }

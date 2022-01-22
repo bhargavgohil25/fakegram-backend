@@ -5,14 +5,14 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class PrivateFile {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  public id: string;
 
   @Column()
-  key: string;
+  public key: string;
 
   @ManyToOne(() => Posts, (post: Posts) => post.images)
-  post: Posts;
+  public post: Posts;
 
   @ManyToOne(() => User, (user: User) => user.postimages)
-  user: User;
+  public user: User;
 }

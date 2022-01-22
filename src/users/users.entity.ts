@@ -74,6 +74,9 @@ export class User extends FakeBaseEntity {
   @Column({ default: false })
   public isTwoFactorAuhenticationEnabled: boolean;
 
+  @Column({ default: true })
+  public isNotification: boolean;
+
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {

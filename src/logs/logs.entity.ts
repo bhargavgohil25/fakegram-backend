@@ -11,13 +11,13 @@ export class Log {
   public id: string;
 
   @Column()
-  public context: string;
+  public context?: string;
 
   @Column()
-  public message: string;
+  public message?: string;
 
   @Column()
-  public level: string;
+  public level?: string;
 
   @CreateDateColumn({ name: 'created_at' })
   creationDate: Date;

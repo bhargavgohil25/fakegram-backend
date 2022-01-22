@@ -22,6 +22,8 @@ import { FilesModule } from './files/files.module';
 import DatabaseLogger from './database/databaseLogger';
 import { LoggerModule } from './logs/logger.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { NotificationsModule } from './notifications/notifications.module';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
@@ -29,6 +31,12 @@ import { ScheduleModule } from '@nestjs/schedule';
       isGlobal: true,
       envFilePath: '.env',
       cache: true,
+    }),
+    BullModule.forRoot({
+      redis: {
+        host: 'localhost',
+        port: 6379,
+      },
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -54,6 +62,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     CommentsModule,
     FilesModule,
     LoggerModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

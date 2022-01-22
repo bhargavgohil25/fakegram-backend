@@ -1,4 +1,4 @@
-import { Injectable, NotAcceptableException } from '@nestjs/common';
+import { Injectable, Logger, NotAcceptableException } from '@nestjs/common';
 import { User } from '../users/users.entity';
 import { Repository } from 'typeorm';
 import { BadRequestException } from '@nestjs/common';
@@ -15,6 +15,8 @@ import { PrivateFile } from '../files/private-file.entity';
 
 @Injectable()
 export class PostsService {
+  private readonly logger = new Logger(PostsService.name);
+
   constructor(
     @InjectRepository(Posts)
     private postsRepo: Repository<Posts>,
@@ -34,11 +36,13 @@ export class PostsService {
   async createPost(
     creator: User,
     body: CreatePostDto,
-    files: Array<Express.Multer.File>
+    files: Array<Express.Multer.File>,
   ) {
     if (!body.caption) {
       throw new BadRequestException('Post must contain some text');
     }
+    
+    this.logger.debug(files);
 
     // Extract hashtags from the post caption body
     const hashtags = body.caption.match(/\#\w+/g); // hashtags are the array of all hashtags in the post caption
@@ -80,12 +84,10 @@ export class PostsService {
     const resPost = await this.postsRepo.save(post);
 
     // Post image implememntation
-    const newFile = await this.addPrivatePostImages(
-      creator,
-      resPost,
-      files
-    );
+    const newFile = await this.addPrivatePostImages(creator, resPost, files);
     resPost.images = newFile;
+
+    this.logger.log(`Post created successfully`, resPost);
 
     return resPost;
   }
@@ -94,20 +96,16 @@ export class PostsService {
   async addPrivatePostImages(
     user: User,
     post: Posts,
-    files: Array<Express.Multer.File>
+    files: Array<Express.Multer.File>,
   ): Promise<PrivateFile[]> {
-    return this.privateFilesService.uploadPrivateFiles(
-      post,
-      user,
-      files
-    );
+    return this.privateFilesService.uploadPrivateFiles(post, user, files);
   }
 
   /**
    * @description Get the private file as a stream (not recommended)
    * @param userid
    * @param fileid
-   * @returns PrivateFile entity of the file 
+   * @returns PrivateFile entity of the file
    */
   // it can be accessed only by the someone who follows the post author and self also
   async getPrivateFile(userid: string, fileid: string) {
@@ -123,7 +121,7 @@ export class PostsService {
 
     const samePerson = userid === file.info.user.id ? true : false;
 
-    if(samePerson){
+    if (samePerson) {
       canFollow = Promise.resolve(true);
     }
 
@@ -169,7 +167,7 @@ export class PostsService {
    * @param {userid} userid
    * @returns {Promise<Posts[]> Posts[]
    */
-  
+
   async getPostsByUserId(userid: string, currentUserId: string) {
     let canFollow: Promise<boolean> = this.usersService.ifFollow(
       userid,
@@ -178,7 +176,7 @@ export class PostsService {
 
     const samePerson = userid === currentUserId ? true : false;
 
-    if(samePerson){
+    if (samePerson) {
       canFollow = Promise.resolve(true);
     }
 

@@ -75,11 +75,11 @@ export class FilesService {
   async uploadPrivateFiles(
     post: Posts,
     user: User,
-    files: Array<Express.Multer.File>
-  ) : Promise<PrivateFile[]> {
+    files: Array<Express.Multer.File>,
+  ): Promise<PrivateFile[]> {
     const s3 = new S3();
-    const filePromises : Array<S3.ManagedUpload.SendData> = [];
-    for(let i = 0; i < files.length; i++) {
+    const filePromises: Array<S3.ManagedUpload.SendData> = [];
+    for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const fileKey = `${uuid()}-${file.originalname}`;
       const uploadParams = {
@@ -88,14 +88,16 @@ export class FilesService {
         Body: file.buffer,
         ACL: 'private',
       };
-      const data : S3.ManagedUpload.SendData = await s3.upload(uploadParams).promise();
+      const data: S3.ManagedUpload.SendData = await s3
+        .upload(uploadParams)
+        .promise();
 
       filePromises.push(data);
     }
 
     const promiseDone = await Promise.all(filePromises);
 
-    const newFiles = promiseDone.map(async data => {
+    const newFiles = promiseDone.map(async (data) => {
       const unsave = this.privateFilesRepository.create({
         key: data.Key,
         user: user,
@@ -103,7 +105,7 @@ export class FilesService {
       });
 
       return await this.privateFilesRepository.save(unsave);
-    })
+    });
 
     return Promise.all(newFiles);
   }
